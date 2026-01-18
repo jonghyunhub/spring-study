@@ -23,8 +23,8 @@ services:
       - "3306:3306"
     environment:
       MYSQL_DATABASE: coredb
-      MYSQL_USER: mysql
-      MYSQL_PASSWORD: mysql
+      MYSQL_USER: jonghyun-mysql
+      MYSQL_PASSWORD: jonghyun-mysql
       MYSQL_ROOT_PASSWORD: root
       TZ: Asia/Seoul
     volumes:

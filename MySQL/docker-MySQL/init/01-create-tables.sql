@@ -2,35 +2,44 @@
 -- 이 파일은 컨테이너 시작 시 자동으로 실행됩니다
 -- 파일명 앞의 숫자(01, 02, ...)로 실행 순서가 결정됩니다
 
+-- 한글 인코딩 설정
+SET NAMES utf8mb4;
+SET CHARACTER_SET_CLIENT = utf8mb4;
+SET CHARACTER_SET_CONNECTION = utf8mb4;
+SET CHARACTER_SET_RESULTS = utf8mb4;
+
 -- 데이터베이스 선택
 USE coredb;
 
--- 예제 테이블: users
--- CREATE TABLE IF NOT EXISTS users (
---     id BIGINT AUTO_INCREMENT PRIMARY KEY,
---     username VARCHAR(50) NOT NULL UNIQUE,
---     email VARCHAR(100) NOT NULL UNIQUE,
---     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
---     INDEX idx_username (username),
---     INDEX idx_email (email)
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE product
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name       varchar(25) NOT NULL,
+    created_at DATETIME(6) NOT NULL,
+    updated_at DATETIME(6) NOT NULL,
+    UNIQUE INDEX uk_name (name)
+);
 
--- 예제 테이블: posts
--- CREATE TABLE IF NOT EXISTS posts (
---     id BIGINT AUTO_INCREMENT PRIMARY KEY,
---     user_id BIGINT NOT NULL,
---     title VARCHAR(255) NOT NULL,
---     content TEXT,
---     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
---     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
---     INDEX idx_user_id (user_id),
---     INDEX idx_created_at (created_at)
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE stock
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT      NOT NULL,
+    quantity   INT         NOT NULL,
+    created_at DATETIME(6) NOT NULL,
+    updated_at DATETIME(6) NOT NULL,
+    UNIQUE INDEX uk_product_id (product_id)
+);
 
--- 위 주석을 해제하고 필요한 테이블을 추가하세요
--- 여러 개의 SQL 파일을 만들어서 관리할 수도 있습니다:
--- 01-create-tables.sql
--- 02-insert-data.sql
--- 03-create-indexes.sql
+-- 테스트용 초기 데이터
+INSERT INTO product (name, created_at, updated_at)
+VALUES ('두바이 쫀득 쿠키', NOW(), NOW());
+
+INSERT INTO product (name, created_at, updated_at)
+VALUES ('두바이 딱딱 강정', NOW(), NOW());
+
+
+INSERT INTO stock (product_id, quantity, created_at, updated_at)
+VALUES (1, 100, NOW(), NOW());
+
+INSERT INTO stock (product_id, quantity, created_at, updated_at)
+VALUES (2, 100, NOW(), NOW());
