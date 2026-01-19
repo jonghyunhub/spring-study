@@ -35,8 +35,8 @@ storage:
     core:
       driver-class-name: com.mysql.cj.jdbc.Driver
       jdbc-url: jdbc:mysql://localhost:3306/coredb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
-      username: mysql
-      password: mysql
+      username: jonghyun-mysql
+      password: jonghyun-mysql
       maximum-pool-size: 5
       connection-timeout: 1100
       keepalive-time: 30000
