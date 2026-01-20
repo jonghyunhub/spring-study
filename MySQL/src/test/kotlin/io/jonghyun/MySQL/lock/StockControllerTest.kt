@@ -32,7 +32,7 @@ class StockControllerTest(
     }
 
     @Test
-    fun `락이 없이 동시에 100건 재고 차감을 수행한다`() {
+    fun `락 없이 동시에 100건 재고 차감을 수행한다`() {
         // given
         val threadCount = 100
         val executor = Executors.newFixedThreadPool(threadCount)

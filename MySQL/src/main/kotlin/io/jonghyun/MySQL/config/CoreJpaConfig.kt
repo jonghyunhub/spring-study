@@ -7,6 +7,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 
 @Configuration
 @EnableTransactionManagement
-@EntityScan
-@EnableJpaRepositories
+@EntityScan(basePackages = ["io.jonghyun.MySQL"])
+@EnableJpaRepositories(basePackages = ["io.jonghyun.MySQL"])
 internal class CoreJpaConfig
