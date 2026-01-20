@@ -6,11 +6,16 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class StockController(
-    val stackService: StockService,
+    val stackService: StockService
 ) {
 
     @PostMapping("/stock-without-lock")
     fun decreaseStockWithOutLock(@RequestBody request: StockRequest) {
         stackService.decreaseStockWithOutLock(productId = request.productId, amount = request.amount)
+    }
+
+    @PostMapping("/stock-with-named-lock")
+    fun decreaseStockWithNamedLock(@RequestBody request: StockRequest) {
+        stackService.decreaseStockWithNamedLockWrongTransaction(productId = request.productId, amount = request.amount)
     }
 }
