@@ -37,7 +37,7 @@ storage:
       jdbc-url: jdbc:mysql://localhost:3306/coredb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
       username: jonghyun-mysql
       password: jonghyun-mysql
-      maximum-pool-size: 5
+      maximum-pool-size: 100
       connection-timeout: 1100
       keepalive-time: 30000
       validation-timeout: 1000

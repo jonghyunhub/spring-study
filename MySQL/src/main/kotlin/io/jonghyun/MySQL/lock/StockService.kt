@@ -104,7 +104,7 @@ class StockService(
 
     /**
      * [트랜잭션 없이 사용하는 방식]
-     * 이 방식의 문제점
+     *  이 방식의 문제점
      * - 스프링 트랜잭션이 없을때, 스프링 내부적으로 같은 메서드 내부의 쿼리 메서드를 같은 커넥션을 사용하도록 보장하지 않는다.
      */
     fun decreaseStockWithNamedLockWithOutTransactional(productId: Long, amount: Int) {
@@ -131,5 +131,7 @@ class StockService(
             logger.info("RELEASE_LOCK - connId: ${releaseResult.connId}, result: ${releaseResult.lockResult}") // 락이 제대로 해제 됐으면 1 리턴
         }
     }
+
+
 
 }
