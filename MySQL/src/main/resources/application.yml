@@ -37,7 +37,7 @@ storage:
       jdbc-url: jdbc:mysql://localhost:3306/coredb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
       username: jonghyun-mysql
       password: jonghyun-mysql
-      maximum-pool-size: 100
+      maximum-pool-size: 5 # 너무 적은 설정후 실험 4동시에 100건 실행하면 타임아웃 발생하여 0건 달성 실패하는 경우가 있음
       connection-timeout: 1100
       keepalive-time: 30000
       validation-timeout: 1000
