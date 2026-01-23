@@ -15,7 +15,7 @@ class StockService(
     }
 
     /**
-     * 락 없이 동작하는 차감 로직
+     * [락 없이 동작하는 차감 로직] => Lost Update 발생
      */
     @Transactional
     fun decreaseStockWithOutLock(productId: Long, amount: Int) {
@@ -25,7 +25,8 @@ class StockService(
     }
 
     /**
-     * 이렇게 하면 안됨 why?
+     * [트랜잭션으로 묶는 방식] => 커밋되기 이전에 락을 해제하여 그 사이에 다른 요청이 들어오면 Lost Update 발생 가능
+     *
      * Named Lock 획득 -> 트랜잭션 시작 -> read -> 차감 로직 -> update -> 트랜잭션 종료 -> Named Lock 해제
      * 의 과정이어야하는데, 이 로직은
      * 트랜잭션 시작 -> Named Lock 획득 -> read -> 차감 로직 -> update -> Named Lock 해제 -> 트랜잭션 종료
@@ -101,6 +102,11 @@ class StockService(
     }
 
 
+    /**
+     * [트랜잭션 없이 사용하는 방식]
+     * 이 방식의 문제점
+     * - 스프링 트랜잭션이 없을때, 스프링 내부적으로 같은 메서드 내부의 쿼리 메서드를 같은 커넥션을 사용하도록 보장하지 않는다.
+     */
     fun decreaseStockWithNamedLockWithOutTransactional(productId: Long, amount: Int) {
         val lockKey = "stock:$productId"
         val lockTimeOutTime = 100

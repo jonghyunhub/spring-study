@@ -16,7 +16,7 @@ class StockController(
 
     @PostMapping("/stock-with-named-lock-wrong-transaction")
     fun decreaseStockWithNamedLockWrongTransaction(@RequestBody request: StockRequest) {
-        stackService.decreaseStockWithNamedLockWithOutTransactional(productId = request.productId, amount = request.amount)
+        stackService.decreaseStockWithNamedLockWrongTransaction(productId = request.productId, amount = request.amount)
     }
 
     @PostMapping("/stock-with-named-lock-without-transaction")

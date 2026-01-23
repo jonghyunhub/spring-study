@@ -20,7 +20,7 @@ class StockControllerTest(
     companion object {
         val logger: Logger = LoggerFactory.getLogger(StockControllerTest::class.java)
         const val PRODUCT_ID = 1L
-        const val INITIAL_QUANTITY = 10
+        const val INITIAL_QUANTITY = 100
     }
 
     @BeforeEach
@@ -106,7 +106,7 @@ class StockControllerTest(
     @Test
     fun `트랜잭션 없이 Named Lock을 통해 동시에 100건 재고 차감을 수행한다`() {
         // given
-        val threadCount = 10
+        val threadCount = 100
         val executor = Executors.newFixedThreadPool(threadCount)
         val latch = CountDownLatch(threadCount)
 
