@@ -1,4 +1,4 @@
-package io.jonghyun.MySQL.lock
+package io.jonghyun.MySQL.namedlock
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query

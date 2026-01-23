@@ -1,4 +1,4 @@
-package io.jonghyun.MySQL.lock
+package io.jonghyun.MySQL.namedlock
 
 data class StockRequest(
     val productId: Long,

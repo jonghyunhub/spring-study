@@ -1,4 +1,4 @@
-package io.jonghyun.MySQL.lock
+package io.jonghyun.MySQL.namedlock
 
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

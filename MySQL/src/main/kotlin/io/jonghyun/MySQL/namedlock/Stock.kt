@@ -1,4 +1,4 @@
-package io.jonghyun.MySQL.lock
+package io.jonghyun.MySQL.namedlock
 
 import io.jonghyun.MySQL.domain.BaseEntity
 import jakarta.persistence.Column

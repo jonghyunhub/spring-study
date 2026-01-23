@@ -1,4 +1,4 @@
-package io.jonghyun.MySQL.lock
+package io.jonghyun.MySQL.namedlock
 
 data class LockResult(
       val lockResult: Long,

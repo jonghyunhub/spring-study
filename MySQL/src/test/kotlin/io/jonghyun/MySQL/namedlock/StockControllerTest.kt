@@ -1,5 +1,6 @@
-package io.jonghyun.MySQL.lock
+package io.jonghyun.MySQL.namedlock
 
+import io.jonghyun.MySQL.common.IntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
