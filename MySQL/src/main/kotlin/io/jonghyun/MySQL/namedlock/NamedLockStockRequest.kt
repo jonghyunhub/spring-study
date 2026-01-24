@@ -1,6 +1,6 @@
 package io.jonghyun.MySQL.namedlock
 
-data class StockRequest(
+data class NamedLockStockRequest(
     val productId: Long,
     val amount: Int,
 )

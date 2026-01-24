@@ -14,13 +14,13 @@ import org.springframework.http.MediaType
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 
-class StockControllerTest(
+class NamedLockStockControllerTest(
     private val testRestTemplate: TestRestTemplate,
     private val namedLockStockRepository: NamedLockStockRepository
 ) : IntegrationTest() {
 
     companion object {
-        val logger: Logger = LoggerFactory.getLogger(StockControllerTest::class.java)
+        val logger: Logger = LoggerFactory.getLogger(NamedLockStockControllerTest::class.java)
         const val PRODUCT_ID = 1L
         const val INITIAL_QUANTITY = 100
     }
@@ -46,7 +46,7 @@ class StockControllerTest(
                     val headers = HttpHeaders().apply {
                         contentType = MediaType.APPLICATION_JSON
                     }
-                    val request = HttpEntity(StockRequest(productId = PRODUCT_ID, amount = 1), headers)
+                    val request = HttpEntity(NamedLockStockRequest(productId = PRODUCT_ID, amount = 1), headers)
                     testRestTemplate.postForEntity("/stock-without-lock", request, Void::class.java)
                 } catch (e: Exception) {
                     logger.error("Error during concurrent request", e)
@@ -82,7 +82,7 @@ class StockControllerTest(
                     val headers = HttpHeaders().apply {
                         contentType = MediaType.APPLICATION_JSON
                     }
-                    val request = HttpEntity(StockRequest(productId = PRODUCT_ID, amount = 1), headers)
+                    val request = HttpEntity(NamedLockStockRequest(productId = PRODUCT_ID, amount = 1), headers)
                     testRestTemplate.postForEntity("/stock-with-named-lock-wrong-transaction", request, Void::class.java)
                 } catch (e: Exception) {
                     logger.error("Error during concurrent request", e)
@@ -118,7 +118,7 @@ class StockControllerTest(
                     val headers = HttpHeaders().apply {
                         contentType = MediaType.APPLICATION_JSON
                     }
-                    val request = HttpEntity(StockRequest(productId = PRODUCT_ID, amount = 1), headers)
+                    val request = HttpEntity(NamedLockStockRequest(productId = PRODUCT_ID, amount = 1), headers)
                     testRestTemplate.postForEntity("/stock-with-named-lock-without-transaction", request, Void::class.java)
                 } catch (e: Exception) {
                     logger.error("Error during concurrent request", e)
@@ -153,7 +153,7 @@ class StockControllerTest(
                     val headers = HttpHeaders().apply {
                         contentType = MediaType.APPLICATION_JSON
                     }
-                    val request = HttpEntity(StockRequest(productId = PRODUCT_ID, amount = 1), headers)
+                    val request = HttpEntity(NamedLockStockRequest(productId = PRODUCT_ID, amount = 1), headers)
                     testRestTemplate.postForEntity("/stock-with-named-lock", request, Void::class.java)
                 } catch (e: Exception) {
                     logger.error("Error during concurrent request", e)

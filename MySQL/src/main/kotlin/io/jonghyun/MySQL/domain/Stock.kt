@@ -3,6 +3,7 @@ package io.jonghyun.MySQL.domain
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
+import jakarta.persistence.Version
 
 @Entity
 @Table(name = "stock")
@@ -11,7 +12,10 @@ class Stock(
     val productId: Long,
 
     @Column(nullable = false)
-    var quantity: Int
+    var quantity: Int,
+
+    @Version
+    var version: Long = 0
 ) : BaseEntity() {
 
     fun decrease(amount: Int) {

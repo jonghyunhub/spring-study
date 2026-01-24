@@ -25,6 +25,7 @@ CREATE TABLE stock
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     product_id BIGINT      NOT NULL,
     quantity   INT         NOT NULL,
+    version INT NOT NULL DEFAULT 0,
     created_at DATETIME(6) NOT NULL,
     updated_at DATETIME(6) NOT NULL,
     UNIQUE INDEX uk_product_id (product_id)

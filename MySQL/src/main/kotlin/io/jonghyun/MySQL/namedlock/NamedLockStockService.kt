@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class NamedLockStockService(
-    private val namedLockStockRepository: NamedLockStockRepository,
+    private val repository: NamedLockStockRepository,
 ) {
 
     companion object {
@@ -18,9 +18,9 @@ class NamedLockStockService(
      */
     @Transactional
     fun decreaseStockWithOutLock(productId: Long, amount: Int) {
-        val stock = namedLockStockRepository.getStockByProductId(productId)
+        val stock = repository.getStockByProductId(productId)
         stock.decrease(amount)
-        namedLockStockRepository.save(stock)
+        repository.save(stock)
     }
 
     /**
@@ -81,7 +81,7 @@ class NamedLockStockService(
         val lockKey = "stock:$productId"
         val lockTimeOutTime = 10
         try {
-            val lockResult = namedLockStockRepository.getNamedLock(lockKey, lockTimeOutTime) // 락 획득 성공하면 1 리턴
+            val lockResult = repository.getNamedLock(lockKey, lockTimeOutTime) // 락 획득 성공하면 1 리턴
             logger.info("GET_LOCK [$lockKey] result: $lockResult")
 
             // 락 획득 실패 시 예외 발생
@@ -90,12 +90,12 @@ class NamedLockStockService(
             }
 
             // 비즈니스 로직
-            val stock = namedLockStockRepository.getStockByProductId(productId)
+            val stock = repository.getStockByProductId(productId)
             stock.decrease(amount)
-            namedLockStockRepository.save(stock)
+            repository.save(stock)
 
         } finally {
-            val releaseResult = namedLockStockRepository.releaseNamedLock(lockKey)
+            val releaseResult = repository.releaseNamedLock(lockKey)
             logger.info("RELEASE_LOCK [$lockKey] result: $releaseResult") // 락이 제대로 해제 됐으면 1 리턴
         }
     }
@@ -110,7 +110,7 @@ class NamedLockStockService(
         val lockKey = "stock:$productId"
         val lockTimeOutTime = 100
         try {
-            val lockResult = namedLockStockRepository.getNamedLockWithConnectionId(lockKey, lockTimeOutTime)
+            val lockResult = repository.getNamedLockWithConnectionId(lockKey, lockTimeOutTime)
             logger.info("GET_LOCK - connId: ${lockResult.connId}, result: ${lockResult.lockResult}")
 
             // 락 획득 실패 시 예외 발생
@@ -119,14 +119,14 @@ class NamedLockStockService(
             }
 
             // 비즈니스 로직
-            val stock = namedLockStockRepository.getStockByProductId(productId)
+            val stock = repository.getStockByProductId(productId)
 
             Thread.sleep(100) // 비즈니스 로직에서 지연발생
 
             stock.decrease(amount)
-            namedLockStockRepository.save(stock)
+            repository.save(stock)
         } finally {
-            val releaseResult = namedLockStockRepository.releaseNamedLockWithConnectionId(lockKey)
+            val releaseResult = repository.releaseNamedLockWithConnectionId(lockKey)
             logger.info("RELEASE_LOCK - connId: ${releaseResult.connId}, result: ${releaseResult.lockResult}") // 락이 제대로 해제 됐으면 1 리턴
         }
     }

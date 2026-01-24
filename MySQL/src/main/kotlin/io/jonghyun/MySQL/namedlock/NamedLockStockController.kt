@@ -11,22 +11,22 @@ class NamedLockStockController(
 ) {
 
     @PostMapping("/stock-without-lock")
-    fun decreaseStockWithOutLock(@RequestBody request: StockRequest) {
+    fun decreaseStockWithOutLock(@RequestBody request: NamedLockStockRequest) {
         stackService.decreaseStockWithOutLock(productId = request.productId, amount = request.amount)
     }
 
     @PostMapping("/stock-with-named-lock-wrong-transaction")
-    fun decreaseStockWithNamedLockWrongTransaction(@RequestBody request: StockRequest) {
+    fun decreaseStockWithNamedLockWrongTransaction(@RequestBody request: NamedLockStockRequest) {
         stackService.decreaseStockWithNamedLockWrongTransaction(productId = request.productId, amount = request.amount)
     }
 
     @PostMapping("/stock-with-named-lock-without-transaction")
-    fun decreaseStockWithNamedLockWithOutTransaction(@RequestBody request: StockRequest) {
+    fun decreaseStockWithNamedLockWithOutTransaction(@RequestBody request: NamedLockStockRequest) {
         stackService.decreaseStockWithNamedLockWithOutTransactional(productId = request.productId, amount = request.amount)
     }
 
     @PostMapping("/stock-with-named-lock")
-    fun decreaseStockWithNamedLock(@RequestBody request: StockRequest) {
+    fun decreaseStockWithNamedLock(@RequestBody request: NamedLockStockRequest) {
         namedLockStockFacade.decreaseStock(productId = request.productId, amount = request.amount)
     }
 }
