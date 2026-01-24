@@ -215,18 +215,3 @@ redis-cli GET session  # (nil)
 - ✅ 키 만료 (TTL)
 
 ---
-
-### 🚀 더 나아가기 (보너스 챌린지)
-
-Redis를 더 깊이 이해하고 싶다면 다음 기능들을 추가로 구현해보세요:
-
-| 챌린지 | 난이도 | 배울 수 있는 것 |
-|--------|--------|-----------------|
-| DEL, EXISTS 명령어 | ⬤○○ | 기본 명령어 확장 |
-| INCR, DECR 명령어 | ⬤⬤○ | 원자적 연산 |
-| LPUSH, RPUSH, LPOP, RPOP | ⬤⬤○ | List 자료구조 |
-| SADD, SMEMBERS, SISMEMBER | ⬤⬤○ | Set 자료구조 |
-| ZADD, ZRANGE, ZRANK | ⬤⬤⬤ | Sorted Set, 랭킹 시스템 |
-| PUBLISH, SUBSCRIBE | ⬤⬤⬤ | Pub/Sub 패턴 |
-| RDB 스냅샷 저장 | ⬤⬤⬤ | 영속성, 파일 I/O |
-| 단일 스레드 이벤트 루프로 리팩토링 | ⬤⬤⬤ | NIO, 비동기 프로그래밍 |
