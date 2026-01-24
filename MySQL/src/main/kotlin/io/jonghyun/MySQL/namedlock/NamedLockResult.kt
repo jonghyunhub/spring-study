@@ -1,6 +1,6 @@
 package io.jonghyun.MySQL.namedlock
 
-data class LockResult(
+data class NamedLockResult(
       val lockResult: Long,
       val connId: Long
   )

@@ -5,12 +5,12 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class StockService(
-    private val stockRepository: StockRepository,
+class NamedLockStockService(
+    private val namedLockStockRepository: NamedLockStockRepository,
 ) {
 
     companion object {
-        val logger = LoggerFactory.getLogger(StockService::class.java)!!
+        val logger = LoggerFactory.getLogger(NamedLockStockService::class.java)!!
     }
 
     /**
@@ -18,9 +18,9 @@ class StockService(
      */
     @Transactional
     fun decreaseStockWithOutLock(productId: Long, amount: Int) {
-        val stock = stockRepository.getStockByProductId(productId)
+        val stock = namedLockStockRepository.getStockByProductId(productId)
         stock.decrease(amount)
-        stockRepository.save(stock)
+        namedLockStockRepository.save(stock)
     }
 
     /**
@@ -81,7 +81,7 @@ class StockService(
         val lockKey = "stock:$productId"
         val lockTimeOutTime = 10
         try {
-            val lockResult = stockRepository.getNamedLock(lockKey, lockTimeOutTime) // 락 획득 성공하면 1 리턴
+            val lockResult = namedLockStockRepository.getNamedLock(lockKey, lockTimeOutTime) // 락 획득 성공하면 1 리턴
             logger.info("GET_LOCK [$lockKey] result: $lockResult")
 
             // 락 획득 실패 시 예외 발생
@@ -90,12 +90,12 @@ class StockService(
             }
 
             // 비즈니스 로직
-            val stock = stockRepository.getStockByProductId(productId)
+            val stock = namedLockStockRepository.getStockByProductId(productId)
             stock.decrease(amount)
-            stockRepository.save(stock)
+            namedLockStockRepository.save(stock)
 
         } finally {
-            val releaseResult = stockRepository.releaseNamedLock(lockKey)
+            val releaseResult = namedLockStockRepository.releaseNamedLock(lockKey)
             logger.info("RELEASE_LOCK [$lockKey] result: $releaseResult") // 락이 제대로 해제 됐으면 1 리턴
         }
     }
@@ -110,7 +110,7 @@ class StockService(
         val lockKey = "stock:$productId"
         val lockTimeOutTime = 100
         try {
-            val lockResult = stockRepository.getNamedLockWithConnectionId(lockKey, lockTimeOutTime)
+            val lockResult = namedLockStockRepository.getNamedLockWithConnectionId(lockKey, lockTimeOutTime)
             logger.info("GET_LOCK - connId: ${lockResult.connId}, result: ${lockResult.lockResult}")
 
             // 락 획득 실패 시 예외 발생
@@ -119,14 +119,14 @@ class StockService(
             }
 
             // 비즈니스 로직
-            val stock = stockRepository.getStockByProductId(productId)
+            val stock = namedLockStockRepository.getStockByProductId(productId)
 
             Thread.sleep(100) // 비즈니스 로직에서 지연발생
 
             stock.decrease(amount)
-            stockRepository.save(stock)
+            namedLockStockRepository.save(stock)
         } finally {
-            val releaseResult = stockRepository.releaseNamedLockWithConnectionId(lockKey)
+            val releaseResult = namedLockStockRepository.releaseNamedLockWithConnectionId(lockKey)
             logger.info("RELEASE_LOCK - connId: ${releaseResult.connId}, result: ${releaseResult.lockResult}") // 락이 제대로 해제 됐으면 1 리턴
         }
     }

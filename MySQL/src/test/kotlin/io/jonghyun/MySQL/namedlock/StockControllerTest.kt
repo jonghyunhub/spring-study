@@ -1,6 +1,7 @@
 package io.jonghyun.MySQL.namedlock
 
 import io.jonghyun.MySQL.common.IntegrationTest
+import io.jonghyun.MySQL.domain.Stock
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -15,7 +16,7 @@ import java.util.concurrent.Executors
 
 class StockControllerTest(
     private val testRestTemplate: TestRestTemplate,
-    private val stockRepository: StockRepository
+    private val namedLockStockRepository: NamedLockStockRepository
 ) : IntegrationTest() {
 
     companion object {
@@ -26,8 +27,8 @@ class StockControllerTest(
 
     @BeforeEach
     fun setUp() {
-        stockRepository.deleteAll()
-        stockRepository.save(Stock(productId = PRODUCT_ID, quantity = INITIAL_QUANTITY))
+        namedLockStockRepository.deleteAll()
+        namedLockStockRepository.save(Stock(productId = PRODUCT_ID, quantity = INITIAL_QUANTITY))
     }
 
     // 실험 1
@@ -59,7 +60,7 @@ class StockControllerTest(
         executor.shutdown()
 
         // then
-        val stock = stockRepository.getStockByProductId(PRODUCT_ID)
+        val stock = namedLockStockRepository.getStockByProductId(PRODUCT_ID)
         logger.info("Final quantity: ${stock.quantity}, Expected: 0")
 
         // 락이 없으므로 동시성 문제로 인해 0이 아닐 것으로 예상
@@ -95,7 +96,7 @@ class StockControllerTest(
         executor.shutdown()
 
         // then
-        val stock = stockRepository.getStockByProductId(PRODUCT_ID)
+        val stock = namedLockStockRepository.getStockByProductId(PRODUCT_ID)
         logger.info("Final quantity: ${stock.quantity}, Expected: 0")
 
         assertThat(stock.quantity).isNotEqualTo(0)
@@ -131,7 +132,7 @@ class StockControllerTest(
         executor.shutdown()
 
         // then
-        val stock = stockRepository.getStockByProductId(PRODUCT_ID)
+        val stock = namedLockStockRepository.getStockByProductId(PRODUCT_ID)
         logger.info("Final quantity: ${stock.quantity}, Expected: 0")
 
         assertThat(stock.quantity).isEqualTo(0)
@@ -166,7 +167,7 @@ class StockControllerTest(
         executor.shutdown()
 
         // then
-        val stock = stockRepository.getStockByProductId(PRODUCT_ID)
+        val stock = namedLockStockRepository.getStockByProductId(PRODUCT_ID)
         logger.info("Final quantity: ${stock.quantity}, Expected: 0")
 
         // Named Lock을 통해 락을 얻고 동시성 요청이 동기적으로 수행되므로 0이 됨

@@ -1,6 +1,5 @@
-package io.jonghyun.MySQL.namedlock
+package io.jonghyun.MySQL.domain
 
-import io.jonghyun.MySQL.domain.BaseEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table

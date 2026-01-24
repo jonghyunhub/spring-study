@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class StockController(
-    val stackService: StockService,
-    val stockFacade: StockFacade
+class NamedLockStockController(
+    val stackService: NamedLockStockService,
+    val namedLockStockFacade: NamedLockStockFacade
 ) {
 
     @PostMapping("/stock-without-lock")
@@ -27,6 +27,6 @@ class StockController(
 
     @PostMapping("/stock-with-named-lock")
     fun decreaseStockWithNamedLock(@RequestBody request: StockRequest) {
-        stockFacade.decreaseStock(productId = request.productId, amount = request.amount)
+        namedLockStockFacade.decreaseStock(productId = request.productId, amount = request.amount)
     }
 }
