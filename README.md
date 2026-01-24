@@ -8,3 +8,15 @@
 
 ## Named Lock
 [Spring에서 MySQL NamedLock을 사용시 주의점 (Thread 와 Connection은 다르게 관리된다)](https://velog.io/@jonghyun3668/Spring%EC%97%90%EC%84%9C-MySQL-NamedLock%EC%9D%84-%EC%82%AC%EC%9A%A9%EC%8B%9C-%EC%A3%BC%EC%9D%98%EC%A0%90)
+
+## Optimistic Lock vs Pesimistic Lock
+// todo
+
+## Transaction Isolation Level
+// todo
+
+## Covering Index
+// todo
+
+# Redis 해보면서 제대로 먹어보기
+// todo
