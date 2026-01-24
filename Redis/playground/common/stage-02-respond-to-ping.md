@@ -91,7 +91,7 @@ fun main() {
 
 ```bash
 # redis-cli로 PING 테스트
-redis-cli PING
+redis-cli PING 
 # 예상 출력: PONG
 
 # 또는 netcat으로 직접 RESP 프로토콜 전송

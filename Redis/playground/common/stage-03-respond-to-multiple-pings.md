@@ -91,6 +91,7 @@ fun main() {
 
 ```bash
 # redis-cli로 여러 PING 테스트
+# 주의사항 redis-cli 실행시 바로 "COMMAND DOCS" 명령어 실행후 "+OK" 응답이 넘어와야 redis-cli와 연결이 수립됨
 redis-cli
 127.0.0.1:6379> PING
 PONG
