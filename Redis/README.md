@@ -1,3 +1,7 @@
+# Redis playground
+레디스 코틀린 코드로 만들어보면서 찍어먹어보기
+/playground 디렉토리
+
 ### Development environment setup
 
 ## Docker Redis Setup

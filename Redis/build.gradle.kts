@@ -119,3 +119,12 @@ allOpen {
     annotation("jakarta.persistence.MappedSuperclass")
     annotation("jakarta.persistence.Embeddable")
 }
+
+// playground 예제 실행 용도
+sourceSets {
+    main {
+        kotlin {
+            srcDir("playground")
+        }
+    }
+}

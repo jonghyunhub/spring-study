@@ -2,8 +2,6 @@ package io.jonghyun.Redis.playground.common
 
 import java.net.ServerSocket
 
-class Stage01Main
-
 fun main() {
     val serverSocket = ServerSocket(6379)
     serverSocket.reuseAddress = true
