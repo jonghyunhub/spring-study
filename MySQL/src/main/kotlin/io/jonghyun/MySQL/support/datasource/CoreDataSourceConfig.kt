@@ -1,4 +1,4 @@
-package io.jonghyun.MySQL.config
+package io.jonghyun.MySQL.support.datasource
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 internal class CoreDataSourceConfig {
     @Bean
-    @ConfigurationProperties(prefix = "storage.datasource.core")
+    @ConfigurationProperties(prefix = "support.datasource.core")
     fun coreHikariConfig(): HikariConfig {
         return HikariConfig()
     }

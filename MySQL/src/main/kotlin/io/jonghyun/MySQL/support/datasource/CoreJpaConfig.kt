@@ -1,4 +1,4 @@
-package io.jonghyun.MySQL.config
+package io.jonghyun.MySQL.support.datasource
 
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.context.annotation.Configuration
