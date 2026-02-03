@@ -1,4 +1,4 @@
-rootProject.name = "jonghyun-jpa-study"
+rootProject.name = "jonghyun-spring-study-jpa"
 
 pluginManagement {
     val kotlinVersion: String by settings

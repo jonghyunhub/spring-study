@@ -8,7 +8,10 @@ spring:
     hibernate:
       ddl-auto: validate
     properties:
-      hibernate.default_batch_fetch_size: 100
+      hibernate:
+        default_batch_fetch_size: 100
+        format_sql: true
+        show_sql: true
 
 server:
   tomcat:
@@ -16,19 +19,6 @@ server:
     threads:
       max: 600
       min-spare: 100
-
-
----
-spring.config.activate.on-profile: local
-
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: create
-    properties:
-      hibernate:
-        format_sql: true
-        show_sql: true
 
 storage:
   datasource:
