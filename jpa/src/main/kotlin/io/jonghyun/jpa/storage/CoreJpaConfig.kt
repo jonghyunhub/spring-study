@@ -1,4 +1,4 @@
-package io.jonghyun.jpa.config
+package io.jonghyun.jpa.storage
 
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.context.annotation.Configuration

@@ -1,4 +1,4 @@
-package io.jonghyun.jpa.domain
+package io.jonghyun.jpa.support.entity
 
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType

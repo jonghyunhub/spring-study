@@ -1,4 +1,4 @@
-package io.jonghyun.jpa.config
+package io.jonghyun.jpa.storage
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
