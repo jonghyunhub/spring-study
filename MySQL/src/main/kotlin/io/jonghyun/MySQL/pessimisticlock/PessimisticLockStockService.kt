@@ -9,6 +9,7 @@ class PessimisticLockStockService(
     private val stockRepository: PessimisticLockStockRepository
 ) {
 
+    // pk - id 기반 조회
     @Transactional
     fun lockByPrimaryKey(id: Long, holdLockSeconds: Int = 0): Stock? {
         val stock = stockRepository.findByIdWithLock(id).orElse(null)
@@ -18,6 +19,7 @@ class PessimisticLockStockService(
         return stock
     }
 
+    // unique index - productId 기반 조회
     @Transactional
     fun lockByUniqueIndex(productId: Long, holdLockSeconds: Int = 0): Stock? {
         val stock = stockRepository.findByProductIdWithLock(productId).orElse(null)

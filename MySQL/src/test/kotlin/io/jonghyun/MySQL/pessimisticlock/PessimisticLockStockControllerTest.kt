@@ -51,8 +51,7 @@ class PessimisticLockStockControllerTest(
     @DisplayName("Record Lock (PK) - 동일 레코드 락 시 대기 발생")
     fun testRecordLockByPrimaryKey()  {
         // given
-        val stock = stockRepository.findAll().first()
-        val stockId = stock.id!!
+        val stockId = 1L
         val executor = Executors.newFixedThreadPool(2)
         val latch = CountDownLatch(2)
         val durations = mutableListOf<Long>()
@@ -71,6 +70,10 @@ class PessimisticLockStockControllerTest(
         }
 
         Thread.sleep(100) // Thread-1이 먼저 락 획득하도록
+
+        // performance_schema에서 Record Lock 확인
+        val locks = testRestTemplate.getForObject("/pessimistic-lock/locks", LockMonitoringResponse::class.java)!!
+        assertThat(locks.locks).anyMatch { it.lockType == "RECORD" && it.lockMode.contains("X") }
 
         // when: Thread-2가 동일 레코드 락 시도
         executor.submit {
@@ -94,28 +97,61 @@ class PessimisticLockStockControllerTest(
     }
 
     @Test
-    @DisplayName("Phase 2-2: Record Lock (Unique Index) - 정상 동작 확인")
+    @DisplayName("Record Lock (Unique Index) - 동일 레코드 락 시 대기 발생")
     fun testRecordLockByUniqueIndex() {
-        // given & when
-        val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
-        val request = HttpEntity(LockByProductIdRequest(productId = 1), headers)
-        val response = testRestTemplate.postForEntity("/pessimistic-lock/lock-by-unique-index", request, String::class.java)
+        val executor = Executors.newFixedThreadPool(2)
+        val latch = CountDownLatch(2)
+        val durations = mutableListOf<Long>()
 
-        // then: Unique Index로 조회해도 Record Lock 동작 확인
-        val actualJson = response.body!!
-        val stock1 = stockRepository.findAll().find { it.productId == 1L }!!
-        val expectedJson = """
-        {
-          "success": true,
-          "message": "Lock acquired by unique index: productId=1",
-          "stock": {"id": ${stock1.id}, "productId": 1, "quantity": 100, "version": 0}
+        // Thread-1: productId=1 락 획득 후 3초 유지
+        executor.submit {
+            try {
+                val start = System.currentTimeMillis()
+                val headers = HttpHeaders().apply { contentType =
+                    MediaType.APPLICATION_JSON }
+                val request = HttpEntity(LockByProductIdRequest(productId = 1,
+                    holdLockSeconds = 3), headers)
+
+                testRestTemplate.postForEntity("/pessimistic-lock/lock-by-unique-index",
+                    request, String::class.java)
+                durations.add(System.currentTimeMillis() - start)
+            } finally {
+                latch.countDown()
+            }
         }
-        """
-        JSONAssert.assertEquals(expectedJson, actualJson, JSONCompareMode.LENIENT)
+
+        Thread.sleep(100)
+
+        //  performance_schema에서 Record Lock 확인
+        val locks = testRestTemplate.getForObject("/pessimistic-lock/locks", LockMonitoringResponse::class.java)!!
+        assertThat(locks.locks).anyMatch { it.lockType == "RECORD" && it.lockMode.contains("X") }
+
+        // Thread-2: 동일 productId=1 락 시도 → 대기 발생해야 함
+        executor.submit {
+            try {
+                val start = System.currentTimeMillis()
+                val headers = HttpHeaders().apply { contentType =
+                    MediaType.APPLICATION_JSON }
+                val request = HttpEntity(LockByProductIdRequest(productId = 1),
+                    headers)
+
+                testRestTemplate.postForEntity("/pessimistic-lock/lock-by-unique-index",
+                    request, String::class.java)
+                durations.add(System.currentTimeMillis() - start)
+            } finally {
+                latch.countDown()
+            }
+        }
+
+        latch.await(10, TimeUnit.SECONDS)
+        executor.shutdown()
+
+        assertThat(durations[0]).isLessThan(3500)
+        assertThat(durations[1]).isGreaterThan(2900) // 락 대기 증명
     }
 
     @Test
-    @DisplayName("Phase 3: Gap Lock - 존재하지 않는 범위 조회 시 INSERT 차단")
+    @DisplayName("존재하지 않는 범위 조회 시 INSERT 차단")
     fun testGapLock() {
         // given: 현재 id = 1,2,3,4,5,6 존재
         val executor = Executors.newFixedThreadPool(2)
@@ -174,7 +210,7 @@ class PessimisticLockStockControllerTest(
     }
 
     @Test
-    @DisplayName("Phase 4: Next Key Lock - 범위 조회 시 Record + Gap Lock")
+    @DisplayName("범위 조회 시 Record + Gap Lock")
     fun testNextKeyLock() {
         // given: id = 1,2,3,4,5,6 존재
         val executor = Executors.newFixedThreadPool(2)
@@ -217,7 +253,7 @@ class PessimisticLockStockControllerTest(
     }
 
     @Test
-    @DisplayName("Phase 5: 인덱스 없는 컬럼 조회 - 전체 테이블 락")
+    @DisplayName("인덱스 없는 컬럼 조회 - 전체 테이블 락")
     fun testFullTableLockWithoutIndex() {
         // given: quantity 컬럼에 인덱스 없음
         val executor = Executors.newFixedThreadPool(2)
@@ -276,7 +312,7 @@ class PessimisticLockStockControllerTest(
     }
 
     @Test
-    @DisplayName("Phase 6: 재고 차감 - 락 없이 100번 동시 차감 (Lost Update)")
+    @DisplayName("재고 차감 - 락 없이 100번 동시 차감 (Lost Update)")
     fun testDecreaseStockWithoutLock() {
         // given
         val stock = stockRepository.findAll().first()
@@ -312,7 +348,7 @@ class PessimisticLockStockControllerTest(
     }
 
     @Test
-    @DisplayName("Phase 6: 재고 차감 - Pessimistic Lock으로 100번 동시 차감 성공")
+    @DisplayName("재고 차감 - Pessimistic Lock으로 100번 동시 차감 성공")
     fun testDecreaseStockWithLock() {
         // given
         val stock = stockRepository.findAll().first()

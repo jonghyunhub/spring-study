@@ -13,8 +13,7 @@ interface PessimisticLockStockRepository : JpaRepository<Stock, Long> {
     @Query("SELECT s FROM Stock s WHERE s.productId = :productId")
     fun getStockByProductId(@Param("productId") productId: Long): Stock
 
-    // === Record Lock 실험용 메서드 ===
-
+    // lock 모드 PESSIMISTIC_WRITE 지정시  => jpa가 `for update` 추가해줌
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM Stock s WHERE s.id = :id")
     fun findByIdWithLock(@Param("id") id: Long): Optional<Stock>
@@ -24,7 +23,6 @@ interface PessimisticLockStockRepository : JpaRepository<Stock, Long> {
     fun findByProductIdWithLock(@Param("productId") productId: Long): Optional<Stock>
 
     // === Gap Lock / Next Key Lock 실험용 메서드 ===
-
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM Stock s WHERE s.id BETWEEN :startId AND :endId")
     fun findByIdBetweenWithLock(
@@ -37,7 +35,6 @@ interface PessimisticLockStockRepository : JpaRepository<Stock, Long> {
     fun findByIdGreaterThanEqualWithLock(@Param("id") id: Long): List<Stock>
 
     // === 인덱스 없는 컬럼 조회 (전체 테이블 락) ===
-
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM Stock s WHERE s.quantity = :quantity")
     fun findByQuantityWithLock(@Param("quantity") quantity: Int): List<Stock>

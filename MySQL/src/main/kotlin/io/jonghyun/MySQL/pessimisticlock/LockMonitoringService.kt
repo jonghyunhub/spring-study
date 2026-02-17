@@ -10,11 +10,12 @@ class LockMonitoringService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun getCurrentLocks(): List<LockInfo> {
-        return lockMonitoringRepository.getCurrentLocks()
+        val locks = lockMonitoringRepository.getCurrentLocks()
+        printCurrentLocks(locks)
+        return locks
     }
 
-    fun printCurrentLocks(description: String = "") {
-        val locks = getCurrentLocks()
+    fun printCurrentLocks(locks: List<LockInfo>, description: String = "") {
 
         logger.info("========================================")
         if (description.isNotEmpty()) {
