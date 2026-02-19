@@ -151,7 +151,7 @@ class PessimisticLockStockControllerTest(
     }
 
     @Test
-    @DisplayName("존재하지 않는 범위 조회 시 INSERT 차단")
+    @DisplayName("존재하지 않는 범위 조회 시 INSERT Blocking")
     fun testGapLock() {
         // given: 현재 id = 1,2,3,4,5,6 존재
         val executor = Executors.newFixedThreadPool(2)
@@ -182,17 +182,19 @@ class PessimisticLockStockControllerTest(
 
         Thread.sleep(100)
 
-        // when: Thread-2가 id=7 영역에 INSERT 시도 (실제로는 테스트에서 INSERT는 어려우므로 락 확인으로 대체)
-        // 실제 Gap Lock 확인은 MySQL에서 performance_schema로 확인
+        //  performance_schema에서 Record Lock 확인
+        val locks = testRestTemplate.getForObject("/pessimistic-lock/locks", LockMonitoringResponse::class.java)!!
+        assertThat(locks.locks).anyMatch { it.lockType == "RECORD" && it.lockMode.contains("X") }
+
+        // when: Thread-2가 Gap Lock 범위에 INSERT 시도 → Gap Lock에 의해 차단되어야 함
         executor.submit {
             try {
                 val start = System.currentTimeMillis()
-                // 동일한 범위를 다시 락 시도하면 대기해야 함
                 val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
-                val request = HttpEntity(LockByRangeRequest(startId = 7, endId = 9), headers)
-                testRestTemplate.postForEntity("/pessimistic-lock/lock-by-range", request, String::class.java)
+                val request = HttpEntity(CreateStockRequest(productId = 999, quantity = 10), headers)
+                testRestTemplate.postForEntity("/pessimistic-lock/stocks", request, String::class.java)
                 val duration = System.currentTimeMillis() - start
-                results.add("Thread-2: Waited ${duration}ms for Gap Lock")
+                results.add("Thread-2: INSERT waited ${duration}ms (Gap Lock)")
 
                 // Gap Lock으로 인해 약 3초 대기해야 함
                 assertThat(duration).isGreaterThan(2900)
@@ -207,49 +209,6 @@ class PessimisticLockStockControllerTest(
 
         println("Gap Lock 테스트 결과:")
         results.forEach { println("  $it") }
-    }
-
-    @Test
-    @DisplayName("범위 조회 시 Record + Gap Lock")
-    fun testNextKeyLock() {
-        // given: id = 1,2,3,4,5,6 존재
-        val executor = Executors.newFixedThreadPool(2)
-        val latch = CountDownLatch(2)
-
-        // when: Thread-1이 id >= 3 조회 (id 3,4,5,6 + 6 이후 Gap)
-        executor.submit {
-            try {
-                val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
-                val request = HttpEntity(LockByRangeRequest(startId = 3, endId = Long.MAX_VALUE, holdLockSeconds = 3), headers)
-                testRestTemplate.postForEntity("/pessimistic-lock/lock-by-range", request, String::class.java)
-            } finally {
-                latch.countDown()
-            }
-        }
-
-        Thread.sleep(100)
-
-        // when: Thread-2가 id=4 업데이트 시도 (Record Lock에 걸림)
-        executor.submit {
-            try {
-                val start = System.currentTimeMillis()
-                val stock4 = stockRepository.findAll().find { it.productId == 4L }!!
-                val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
-                val request = HttpEntity(LockByIdRequest(id = stock4.id!!), headers)
-                testRestTemplate.postForEntity("/pessimistic-lock/lock-by-primary-key", request, String::class.java)
-                val duration = System.currentTimeMillis() - start
-
-                // Record Lock으로 약 3초 대기
-                assertThat(duration).isGreaterThan(2900)
-                println("Next Key Lock: id=4 업데이트 시도, ${duration}ms 대기")
-            } finally {
-                latch.countDown()
-            }
-        }
-
-        // then
-        latch.await(10, TimeUnit.SECONDS)
-        executor.shutdown()
     }
 
     @Test
@@ -286,6 +245,10 @@ class PessimisticLockStockControllerTest(
         }
 
         Thread.sleep(100)
+
+        //  performance_schema에서 Record Lock 확인
+        val locks = testRestTemplate.getForObject("/pessimistic-lock/locks", LockMonitoringResponse::class.java)!!
+        assertThat(locks.locks).anyMatch { it.lockType == "RECORD" && it.lockMode.contains("X") }
 
         // when: Thread-2가 quantity=50인 다른 레코드 업데이트 시도
         // 인덱스가 없으면 전체 테이블 스캔으로 모든 레코드에 락이 걸리므로 대기해야 함

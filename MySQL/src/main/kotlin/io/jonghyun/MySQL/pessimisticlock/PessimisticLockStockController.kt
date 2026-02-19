@@ -87,6 +87,18 @@ class PessimisticLockStockController(
         )
     }
 
+    @PostMapping("/stocks")
+    fun create(@RequestBody request: CreateStockRequest): ResponseEntity<LockResponse> {
+        val stock = stockService.create(request.productId, request.quantity)
+        return ResponseEntity.ok(
+            LockResponse(
+                success = true,
+                message = "Stock created: productId=${request.productId}",
+                stock = StockDto.from(stock)
+            )
+        )
+    }
+
     @GetMapping("/locks")
     fun getCurrentLocks(): ResponseEntity<LockMonitoringResponse> {
         val locks = lockMonitoringService.getCurrentLocks()

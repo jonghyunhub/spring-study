@@ -69,6 +69,11 @@ class PessimisticLockStockService(
     }
 
     @Transactional
+    fun create(productId: Long, quantity: Int): Stock {
+        return stockRepository.save(Stock(productId = productId, quantity = quantity))
+    }
+
+    @Transactional
     fun decreaseStockWithoutLock(id: Long, amount: Int): Stock {
         val stock = stockRepository.findById(id).orElseThrow {
             IllegalArgumentException("Stock not found: id=$id")

@@ -25,3 +25,8 @@ data class DecreaseStockRequest(
     val id: Long,
     val amount: Int
 )
+
+data class CreateStockRequest(
+    val productId: Long,
+    val quantity: Int
+)
