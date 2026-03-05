@@ -20,10 +20,10 @@ class CacheConfig {
         val defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
             .entryTtl(Duration.ofSeconds(60))
             .serializeKeysWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer())
+                RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()),
             )
             .serializeValuesWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(GenericJackson2JsonRedisSerializer())
+                RedisSerializationContext.SerializationPair.fromSerializer(GenericJackson2JsonRedisSerializer()),
             )
 
         return RedisCacheManager.builder(connectionFactory)
@@ -31,8 +31,8 @@ class CacheConfig {
             .withInitialCacheConfigurations(
                 mapOf(
                     "products" to defaultConfig.entryTtl(Duration.ofSeconds(60)),
-                    "products-short-ttl" to defaultConfig.entryTtl(Duration.ofSeconds(2))
-                )
+                    "products-short-ttl" to defaultConfig.entryTtl(Duration.ofSeconds(2)),
+                ),
             )
             .build()
     }
