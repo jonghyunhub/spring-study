@@ -49,7 +49,7 @@ storage:
   datasource:
     core:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      jdbc-url: jdbc:mysql://localhost:3306/coredb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+      jdbc-url: jdbc:mysql://localhost:3306/redisdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
       username: jonghyun-mysql
       password: jonghyun-mysql
       maximum-pool-size: 5
