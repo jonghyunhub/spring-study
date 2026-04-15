@@ -9,6 +9,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import io.jonghyun.Redis.caching.ProductDto
 import org.springframework.cache.CacheManager
 
 /**
@@ -54,6 +55,25 @@ class ProductCacheEvictTest(
         // when: 다음 읽기 → 캐시 미스 → DB에서 변경된 데이터 반환
         val after = productCacheService.getProduct(product.id)
         assertThat(after.name).isEqualTo("변경된 이름")
+    }
+
+    @Test
+    @DisplayName("[실험 A] @CacheEvict 없이 업데이트 → 캐시에 옛날 데이터 잔류 (stale cache)")
+    fun staleCacheWithoutEvict() {
+        // given: 캐시 저장
+        val before = productCacheService.getProduct(product.id)
+        assertThat(before.name).isEqualTo("원래 이름")
+
+        // when: @CacheEvict 없이 업데이트 → DB만 변경, 캐시는 그대로
+        productCacheService.updateProductNameWithoutEvict(product.id, "변경된 이름")
+
+        // then: 캐시에 여전히 옛날 이름이 남아있음
+        val cached = cacheManager.getCache("products")?.get(product.id, ProductDto::class.java)
+        assertThat(cached?.name).isEqualTo("원래 이름")  // DB는 "변경된 이름"이지만 캐시는 "원래 이름"
+
+        // then: 다음 읽기도 캐시 히트 → 여전히 옛날 데이터 반환
+        val after = productCacheService.getProduct(product.id)
+        assertThat(after.name).isEqualTo("원래 이름")  // stale cache!
     }
 
     @Test

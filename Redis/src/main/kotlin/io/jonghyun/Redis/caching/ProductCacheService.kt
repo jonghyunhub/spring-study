@@ -37,4 +37,13 @@ class ProductCacheService(
         product.name = name
         return productRepository.save(product).toDto()
     }
+
+    // [실험 A] @CacheEvict 없이 업데이트 → 캐시에 옛날 데이터 잔류
+    @Transactional
+    fun updateProductNameWithoutEvict(id: Long, name: String): ProductDto {
+        val product = productRepository.findById(id)
+            .orElseThrow { NoSuchElementException("Product not found: $id") }
+        product.name = name
+        return productRepository.save(product).toDto()
+    }
 }
