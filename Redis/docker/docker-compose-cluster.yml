@@ -18,6 +18,9 @@ services:
       --appendonly yes
       --bind 0.0.0.0
       --protected-mode no
+      --cluster-announce-ip 127.0.0.1
+      --cluster-announce-port 7001
+      --cluster-announce-bus-port 17001
     volumes:
       - redis-data-1:/data
     networks:
@@ -38,6 +41,9 @@ services:
       --appendonly yes
       --bind 0.0.0.0
       --protected-mode no
+      --cluster-announce-ip 127.0.0.1
+      --cluster-announce-port 7002
+      --cluster-announce-bus-port 17002
     volumes:
       - redis-data-2:/data
     networks:
@@ -58,6 +64,9 @@ services:
       --appendonly yes
       --bind 0.0.0.0
       --protected-mode no
+      --cluster-announce-ip 127.0.0.1
+      --cluster-announce-port 7003
+      --cluster-announce-bus-port 17003
     volumes:
       - redis-data-3:/data
     networks:
@@ -78,6 +87,9 @@ services:
       --appendonly yes
       --bind 0.0.0.0
       --protected-mode no
+      --cluster-announce-ip 127.0.0.1
+      --cluster-announce-port 7004
+      --cluster-announce-bus-port 17004
     volumes:
       - redis-data-4:/data
     networks:
@@ -98,6 +110,9 @@ services:
       --appendonly yes
       --bind 0.0.0.0
       --protected-mode no
+      --cluster-announce-ip 127.0.0.1
+      --cluster-announce-port 7005
+      --cluster-announce-bus-port 17005
     volumes:
       - redis-data-5:/data
     networks:
@@ -118,6 +133,9 @@ services:
       --appendonly yes
       --bind 0.0.0.0
       --protected-mode no
+      --cluster-announce-ip 127.0.0.1
+      --cluster-announce-port 7006
+      --cluster-announce-bus-port 17006
     volumes:
       - redis-data-6:/data
     networks:
@@ -137,12 +155,12 @@ services:
       sh -c "
       sleep 5 &&
       redis-cli --cluster create
-        redis-node-1:7001
-        redis-node-2:7002
-        redis-node-3:7003
-        redis-node-4:7004
-        redis-node-5:7005
-        redis-node-6:7006
+        127.0.0.1:7001
+        127.0.0.1:7002
+        127.0.0.1:7003
+        127.0.0.1:7004
+        127.0.0.1:7005
+        127.0.0.1:7006
         --cluster-replicas 1
         --cluster-yes
       "
