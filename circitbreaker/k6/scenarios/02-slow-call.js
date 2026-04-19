@@ -15,7 +15,12 @@
  *   FeignConfig read-timeout     : 5s  (slow call이 timeout 전에 응답 받아야 카운트됨)
  *
  * 실행
- *   k6 run k6/scenarios/02-slow-call.js
+ *   # 빌트인 웹 대시보드 (http://localhost:5665)
+ *   K6_WEB_DASHBOARD=true k6 run k6/scenarios/02-slow-call.js
+ *
+ *   # Grafana 연동 (기존 Prometheus로 push)
+ *   K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9090/api/v1/write \
+ *   k6 run --out experimental-prometheus-rw k6/scenarios/02-slow-call.js
  */
 
 import { sleep, check } from 'k6';
@@ -24,9 +29,9 @@ import { setStubMode, getCBState, CORE_API } from '../lib/helpers.js';
 
 export const options = {
   stages: [
-    { duration: '5s',  target: 3  },  // VU 3명 (slow call이라 VU 적어도 충분)
-    { duration: '60s', target: 3  },  // 60초 지속 — 3초 지연 × 반복
-    { duration: '5s',  target: 0  },
+    { duration: '5s',   target: 3  },  // VU 3명 (slow call이라 VU 적어도 충분)
+    { duration: '110s', target: 3  },  // 110초 지속 — 3초 지연 × 반복
+    { duration: '5s',   target: 0  },
   ],
   thresholds: {
     // 응답시간 p95가 2초 이상이어야 통과 — slow call 발생 여부 검증

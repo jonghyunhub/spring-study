@@ -7,18 +7,23 @@
  *   3건 성공 → CLOSED 복구되는 전체 흐름을 확인합니다.
  *
  * 타임라인
- *   0s  ~ 20s : [phase-1] FAIL 모드 + 5 VU — CB OPEN 유도
- *   20s        [switch]  stub-service를 recover로 전환 (1회성 VU)
- *   20s ~ 30s : [phase-2] OPEN 상태 확인 — 503 차단 검증
- *   35s ~ 55s : [phase-3] HALF_OPEN → CLOSED 복구 확인
- *               (wait-duration 10s + 여유 5s = 35s부터 HALF_OPEN 진입)
+ *   0s  ~ 50s : [phase-1] FAIL 모드 + 5 VU — CB OPEN 유도
+ *   50s        [switch]  stub-service를 recover로 전환 (1회성 VU)
+ *   50s ~ 70s : [phase-2] OPEN 상태 확인 — 503 차단 검증
+ *   65s ~ 115s: [phase-3] HALF_OPEN → CLOSED 복구 확인
+ *               (wait-duration 10s + 여유 5s = 65s부터 HALF_OPEN 진입)
  *
  * CB 설정 (application.yml 기준)
  *   wait-duration-in-open-state                  : 10s
  *   permitted-number-of-calls-in-half-open-state : 3
  *
  * 실행
- *   k6 run k6/scenarios/03-recovery.js
+ *   # 빌트인 웹 대시보드 (http://localhost:5665)
+ *   K6_WEB_DASHBOARD=true k6 run k6/scenarios/03-recovery.js
+ *
+ *   # Grafana 연동 (기존 Prometheus로 push)
+ *   K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9090/api/v1/write \
+ *   k6 run --out experimental-prometheus-rw k6/scenarios/03-recovery.js
  */
 
 import { sleep } from 'k6';
@@ -30,17 +35,17 @@ export const options = {
     'phase-1-induce-open': {
       executor: 'constant-vus',
       vus: 5,
-      duration: '20s',
+      duration: '50s',
       startTime: '0s',
       exec: 'induceOpen',
     },
 
-    // 20s에 stub-service를 recover로 전환 (1회성)
+    // 50s에 stub-service를 recover로 전환 (1회성)
     'switch-to-recover': {
       executor: 'per-vu-iterations',
       vus: 1,
       iterations: 1,
-      startTime: '20s',
+      startTime: '50s',
       exec: 'switchToRecover',
     },
 
@@ -48,8 +53,8 @@ export const options = {
     'phase-2-verify-open': {
       executor: 'constant-vus',
       vus: 2,
-      duration: '10s',
-      startTime: '21s',
+      duration: '20s',
+      startTime: '51s',
       exec: 'verifyOpen',
     },
 
@@ -57,8 +62,8 @@ export const options = {
     'phase-3-verify-recovery': {
       executor: 'constant-vus',
       vus: 3,
-      duration: '20s',
-      startTime: '35s',
+      duration: '50s',
+      startTime: '65s',
       exec: 'verifyRecovery',
     },
   },

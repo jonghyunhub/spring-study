@@ -212,6 +212,29 @@ curl localhost:8081/control/status
 brew install k6
 ```
 
+### 대시보드 옵션
+
+#### 옵션 A — 빌트인 웹 대시보드 (별도 설정 불필요)
+
+```bash
+K6_WEB_DASHBOARD=true k6 run k6/scenarios/01-failure-rate.js
+# → http://localhost:5665 에서 실시간 확인
+```
+
+VU 수, RPS, 응답시간(p50/p95/p99), 에러율을 브라우저에서 즉시 확인할 수 있습니다.
+
+#### 옵션 B — 기존 Grafana에 k6 메트릭 통합 (권장)
+
+k6가 Prometheus로 메트릭을 직접 push하여, CB 대시보드와 k6 대시보드를 같은 Grafana에서 함께 볼 수 있습니다.
+
+```bash
+# Prometheus에 remote write 활성화가 필요합니다 (docker-compose에 이미 적용됨)
+K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9090/api/v1/write \
+k6 run --out experimental-prometheus-rw k6/scenarios/01-failure-rate.js
+```
+
+Grafana 접속 후 **Dashboards → k6 Load Test Dashboard** 에서 확인합니다.
+
 ### 파일 구조
 
 ```

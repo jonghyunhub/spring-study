@@ -1,0 +1,297 @@
+{
+  "title": "k6 Load Test Dashboard",
+  "description": "k6 부하 테스트 결과 — VU 수, 요청 처리량, 응답시간, 에러율",
+  "uid": "k6-load-test",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "5s",
+  "time": { "from": "now-15m", "to": "now" },
+  "timezone": "browser",
+  "tags": ["k6", "load-test"],
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "활성 VU (Virtual Users)",
+      "description": "현재 동시 실행 중인 가상 유저 수",
+      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "k6_vus",
+          "legendFormat": "VUs"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "초당 요청 수 (RPS)",
+      "description": "현재 초당 처리되는 HTTP 요청 수",
+      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "rate(k6_http_reqs_total[1m])",
+          "legendFormat": "RPS"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "에러율",
+      "description": "전체 요청 중 실패한 비율 (check 실패 기준)",
+      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green",  "value": null  },
+              { "color": "yellow", "value": 0.01  },
+              { "color": "red",    "value": 0.05  }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "rate(k6_http_req_failed_total[1m])",
+          "legendFormat": "에러율"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "응답시간 p95",
+      "description": "상위 5% 요청의 응답시간",
+      "gridPos": { "x": 12, "y": 0, "w": 4, "h": 4 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green",  "value": null },
+              { "color": "yellow", "value": 500  },
+              { "color": "red",    "value": 2000 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "histogram_quantile(0.95, rate(k6_http_req_duration_seconds_bucket[1m])) * 1000",
+          "legendFormat": "p95"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "총 요청 수",
+      "gridPos": { "x": 16, "y": 0, "w": 4, "h": 4 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "k6_http_reqs_total",
+          "legendFormat": "총 요청"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "응답시간 분포 (p50 / p95 / p99)",
+      "description": "slow call 임계값(2000ms) 초과 구간에 주목",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": { "lineWidth": 2, "fillOpacity": 5 }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "p99" }, "properties": [{ "id": "color", "value": { "fixedColor": "red",    "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "p95" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "p50" }, "properties": [{ "id": "color", "value": { "fixedColor": "green",  "mode": "fixed" } }] }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "histogram_quantile(0.50, rate(k6_http_req_duration_seconds_bucket[1m])) * 1000",
+          "legendFormat": "p50"
+        },
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "histogram_quantile(0.95, rate(k6_http_req_duration_seconds_bucket[1m])) * 1000",
+          "legendFormat": "p95"
+        },
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "histogram_quantile(0.99, rate(k6_http_req_duration_seconds_bucket[1m])) * 1000",
+          "legendFormat": "p99"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "요청 처리량 및 에러율",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "실패" }, "properties": [{ "id": "color", "value": { "fixedColor": "red",   "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "성공" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "rate(k6_http_reqs_total[1m]) - rate(k6_http_req_failed_total[1m])",
+          "legendFormat": "성공"
+        },
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "rate(k6_http_req_failed_total[1m])",
+          "legendFormat": "실패"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "VU 수 변화",
+      "description": "k6 stages에 따른 VU ramp-up / ramp-down",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 6 },
+      "options": {
+        "tooltip": { "mode": "single" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "lineWidth": 2, "fillOpacity": 20 },
+          "color": { "fixedColor": "blue", "mode": "fixed" }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "k6_vus",
+          "legendFormat": "VUs"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "HTTP 상태 코드별 요청 수",
+      "description": "200·502·503 변화로 CB 상태 전환 시점 파악",
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 6 },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "200 OK"          }, "properties": [{ "id": "color", "value": { "fixedColor": "green",  "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "502 외부오류"    }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "503 CB차단"      }, "properties": [{ "id": "color", "value": { "fixedColor": "red",    "mode": "fixed" } }] }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "rate(k6_http_reqs_total{status=\"200\"}[1m])",
+          "legendFormat": "200 OK"
+        },
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "rate(k6_http_reqs_total{status=\"502\"}[1m])",
+          "legendFormat": "502 외부오류"
+        },
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "rate(k6_http_reqs_total{status=\"503\"}[1m])",
+          "legendFormat": "503 CB차단"
+        }
+      ]
+    }
+  ]
+}

@@ -15,7 +15,12 @@
  *   sliding-window-size     : 10 (최근 10건 기준)
  *
  * 실행
- *   k6 run k6/scenarios/01-failure-rate.js
+ *   # 빌트인 웹 대시보드 (http://localhost:5665)
+ *   K6_WEB_DASHBOARD=true k6 run k6/scenarios/01-failure-rate.js
+ *
+ *   # Grafana 연동 (기존 Prometheus로 push)
+ *   K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9090/api/v1/write \
+ *   k6 run --out experimental-prometheus-rw k6/scenarios/01-failure-rate.js
  */
 
 import { sleep } from 'k6';
@@ -23,9 +28,9 @@ import { setStubMode, callProduct, getCBState } from '../lib/helpers.js';
 
 export const options = {
   stages: [
-    { duration: '5s',  target: 5  },  // VU 5명으로 ramp-up
-    { duration: '30s', target: 5  },  // 30초 지속 — OPEN 전환 유도
-    { duration: '5s',  target: 0  },  // ramp-down
+    { duration: '5s',   target: 5  },  // VU 5명으로 ramp-up
+    { duration: '110s', target: 5  },  // 110초 지속 — OPEN 전환 유도
+    { duration: '5s',   target: 0  },  // ramp-down
   ],
   thresholds: {
     // 503이 1건 이상 발생해야 통과 — CB OPEN 전환 여부 검증
