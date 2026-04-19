@@ -18,12 +18,12 @@ class ProductService(
     }
 
     // CB가 OPEN 상태일 때 — 외부 서비스를 호출하지 않고 즉시 차단 (빠른 실패)
-    private fun getProductFallback(@Suppress("UNUSED_PARAMETER") id: Long, e: CallNotPermittedException): ProductResponse {
+    private fun getProductFallback(id: Long, e: CallNotPermittedException): ProductResponse {
         throw CoreException(ErrorType.CIRCUIT_BREAKER_OPEN)
     }
 
     // 외부 서비스가 실제로 실패했을 때 (500 응답, 타임아웃, 연결 거부 등)
-    private fun getProductFallback(@Suppress("UNUSED_PARAMETER") id: Long, e: Exception): ProductResponse {
+    private fun getProductFallback(id: Long, e: Exception): ProductResponse {
         throw CoreException(ErrorType.EXTERNAL_SERVICE_ERROR)
     }
 }
