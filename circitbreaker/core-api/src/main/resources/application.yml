@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: core-api
+  profiles:
+    active: local
+  web:
+    resources:
+      add-mappings: false
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus, circuitbreakers, circuitbreakerevents
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        resilience4j.circuitbreaker.calls: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      stub-service:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        slow-call-duration-threshold: 2s
+        slow-call-rate-threshold: 50
+        register-health-indicator: true
+        record-exceptions:
+          - java.io.IOException
+          - feign.FeignException
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+stub:
+  service:
+    url: http://localhost:8081

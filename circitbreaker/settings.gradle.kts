@@ -1,9 +1,7 @@
-rootProject.name = "jonghyun-spring-study-circit-breaker"
 pluginManagement {
     val kotlinVersion: String by settings
     val springBootVersion: String by settings
     val springDependencyManagementVersion: String by settings
-    val asciidoctorConvertVersion: String by settings
     val ktlintVersion: String by settings
 
     resolutionStrategy {
@@ -15,9 +13,13 @@ pluginManagement {
                 "org.jetbrains.kotlin.plugin.jpa" -> useVersion(kotlinVersion)
                 "org.springframework.boot" -> useVersion(springBootVersion)
                 "io.spring.dependency-management" -> useVersion(springDependencyManagementVersion)
-                "org.asciidoctor.jvm.convert" -> useVersion(asciidoctorConvertVersion)
                 "org.jlleitschuh.gradle.ktlint" -> useVersion(ktlintVersion)
             }
         }
     }
 }
+
+rootProject.name = "jonghyun-spring-study-circit-breaker"
+
+include("core-api")
+include("stub-service")
