@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 5s      # 5초마다 수집 — 트래픽 실험 중 빠른 반응 확인용
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'core-api'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8080']  # Mac 로컬 앱 접근

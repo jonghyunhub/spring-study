@@ -1,0 +1,280 @@
+{
+  "title": "Circuit Breaker Dashboard",
+  "description": "Resilience4j Circuit Breaker 상태 및 호출 현황 모니터링",
+  "uid": "circuit-breaker-study",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "5s",
+  "time": { "from": "now-15m", "to": "now" },
+  "timezone": "browser",
+  "tags": ["resilience4j", "circuit-breaker"],
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Circuit Breaker 상태",
+      "description": "0=CLOSED(정상) / 1=OPEN(차단) / 2=HALF_OPEN(복구시도)",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "CLOSED",    "color": "green"  } } },
+            { "type": "value", "options": { "1": { "text": "OPEN",      "color": "red"    } } },
+            { "type": "value", "options": { "2": { "text": "HALF_OPEN", "color": "yellow" } } }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green",  "value": null },
+              { "color": "red",    "value": 1    },
+              { "color": "yellow", "value": 2    }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "resilience4j_circuitbreaker_state{name=\"stub-service\"}",
+          "legendFormat": "{{name}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "gauge",
+      "title": "실패율 (Failure Rate %)",
+      "description": "임계값 50% 초과 시 OPEN 전환. -1은 아직 minimum-number-of-calls 미충족",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "minVizWidth": 75,
+        "minVizHeight": 75
+      },
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green",  "value": null },
+              { "color": "yellow", "value": 30   },
+              { "color": "red",    "value": 50   }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "resilience4j_circuitbreaker_failure_rate{name=\"stub-service\"}",
+          "legendFormat": "failure rate"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "gauge",
+      "title": "느린 호출 비율 (Slow Call Rate %)",
+      "description": "2초 이상 걸린 호출 비율. 50% 초과 시 OPEN 전환",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "minVizWidth": 75,
+        "minVizHeight": 75
+      },
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green",  "value": null },
+              { "color": "yellow", "value": 30   },
+              { "color": "red",    "value": 50   }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "resilience4j_circuitbreaker_slow_call_rate{name=\"stub-service\"}",
+          "legendFormat": "slow call rate"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "슬라이딩 윈도우 버퍼 현황",
+      "description": "최근 sliding-window-size(10)건 기준 성공/실패 누적 건수",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "resilience4j_circuitbreaker_buffered_calls{name=\"stub-service\", kind=\"successful\"}",
+          "legendFormat": "성공"
+        },
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "resilience4j_circuitbreaker_buffered_calls{name=\"stub-service\", kind=\"failed\"}",
+          "legendFormat": "실패"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "호출 종류별 초당 처리량",
+      "description": "successful: 성공 / failed: 실패(예외) / not_permitted: CB OPEN으로 차단된 요청",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "successful" }, "properties": [{ "id": "color", "value": { "fixedColor": "green",  "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "failed"      }, "properties": [{ "id": "color", "value": { "fixedColor": "red",    "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "not_permitted"}, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "rate(resilience4j_circuitbreaker_calls_seconds_count{name=\"stub-service\", kind=\"successful\"}[1m])",
+          "legendFormat": "successful"
+        },
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "rate(resilience4j_circuitbreaker_calls_seconds_count{name=\"stub-service\", kind=\"failed\"}[1m])",
+          "legendFormat": "failed"
+        },
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "rate(resilience4j_circuitbreaker_calls_seconds_count{name=\"stub-service\", kind=\"not_permitted\"}[1m])",
+          "legendFormat": "not_permitted"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "HTTP 요청 처리량 (core-api)",
+      "description": "클라이언트에서 core-api로 들어오는 요청 초당 건수",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "2xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "green",  "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "5xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "red",    "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "503" }, "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }] }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "rate(http_server_requests_seconds_count{uri=\"/products/{id}\", status=~\"2..\"}[1m])",
+          "legendFormat": "2xx"
+        },
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "rate(http_server_requests_seconds_count{uri=\"/products/{id}\", status=\"503\"}[1m])",
+          "legendFormat": "503 (CB OPEN)"
+        },
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "rate(http_server_requests_seconds_count{uri=\"/products/{id}\", status=~\"5..\", status!=\"503\"}[1m])",
+          "legendFormat": "5xx (외부 오류)"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Circuit Breaker 상태 변화 이력",
+      "description": "0=CLOSED → 1=OPEN → 2=HALF_OPEN 전환 타임라인",
+      "gridPos": { "x": 0, "y": 12, "w": 24, "h": 6 },
+      "options": {
+        "tooltip": { "mode": "single", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineWidth": 3,
+            "fillOpacity": 20,
+            "drawStyle": "line",
+            "spanNulls": false
+          },
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "CLOSED"    } } },
+            { "type": "value", "options": { "1": { "text": "OPEN"      } } },
+            { "type": "value", "options": { "2": { "text": "HALF_OPEN" } } }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green",  "value": null },
+              { "color": "red",    "value": 1    },
+              { "color": "yellow", "value": 2    }
+            ]
+          },
+          "color": { "mode": "thresholds" }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "resilience4j_circuitbreaker_state{name=\"stub-service\"}",
+          "legendFormat": "CB State"
+        }
+      ]
+    }
+  ]
+}
