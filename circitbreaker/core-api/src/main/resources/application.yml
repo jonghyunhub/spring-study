@@ -31,18 +31,17 @@ resilience4j:
   circuitbreaker:
     instances:
       stub-service:
-        sliding-window-type: COUNT_BASED
-        sliding-window-size: 10
-        minimum-number-of-calls: 5
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 10s
-        permitted-number-of-calls-in-half-open-state: 3
-        slow-call-duration-threshold: 2s
-        slow-call-rate-threshold: 50
-        register-health-indicator: true
-        record-exceptions:
-          - java.io.IOException
-          - feign.FeignException
+        sliding-window-type: COUNT_BASED   # 시간 기준이 아닌 호출 건수 기준
+        sliding-window-size: 10            # 최근 10건을 슬라이딩 윈도우로 관찰
+        minimum-number-of-calls: 5         # 5건 미만이면 실패율 계산 자체를 안 함
+        failure-rate-threshold: 50         # 실패율 > 50% → OPEN
+        wait-duration-in-open-state: 10s   # OPEN 유지 시간, 이후 HALF_OPEN으로 자동 전환
+        permitted-number-of-calls-in-half-open-state: 3  # HALF_OPEN에서 최대 3건 허용
+        slow-call-duration-threshold: 2s   # 2초 이상 걸리면 slow call로 카운트
+        slow-call-rate-threshold: 50       # slow call 비율 > 50% → OPEN
+        record-exceptions:                 # 이 예외들만 실패로 카운트
+            - java.io.IOException
+            - feign.FeignException
 
 ---
 spring:
