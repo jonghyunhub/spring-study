@@ -250,14 +250,19 @@ k6/
 ### 시나리오 1: 실패율 기반 OPEN 전환
 
 ```
-0s        5s              35s      40s
-├─ramp-up─┤───── 5 VU ────┤─down───┤
+0s        5s                          115s    120s
+├─ramp-up─┤────────── 5 VU ───────────┤─down──┤
           stub=FAIL → 반복 호출
           502 × 5건 → CB OPEN → 503 차단
 ```
 
 ```bash
-k6 run k6/scenarios/01-failure-rate.js
+# 옵션 A — 빌트인 웹 대시보드 (http://localhost:5665)
+K6_WEB_DASHBOARD=true k6 run k6/scenarios/01-failure-rate.js
+
+# 옵션 B — Grafana 통합 (Dashboards → k6 Load Test Dashboard)
+K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9090/api/v1/write \
+k6 run --out experimental-prometheus-rw k6/scenarios/01-failure-rate.js
 ```
 
 **Grafana에서 확인할 것**
@@ -267,14 +272,19 @@ k6 run k6/scenarios/01-failure-rate.js
 ### 시나리오 2: slow call 기반 OPEN 전환
 
 ```
-0s        5s                     65s   70s
-├─ramp-up─┤──── 3 VU (3초 지연) ──┤─down─┤
+0s        5s                               115s   120s
+├─ramp-up─┤──────── 3 VU (3초 지연) ────────┤─down─┤
           stub=SLOW → 2초 임계값 초과 카운트
           slow call 비율 50% → CB OPEN
 ```
 
 ```bash
-k6 run k6/scenarios/02-slow-call.js
+# 옵션 A — 빌트인 웹 대시보드 (http://localhost:5665)
+K6_WEB_DASHBOARD=true k6 run k6/scenarios/02-slow-call.js
+
+# 옵션 B — Grafana 통합 (Dashboards → k6 Load Test Dashboard)
+K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9090/api/v1/write \
+k6 run --out experimental-prometheus-rw k6/scenarios/02-slow-call.js
 ```
 
 **Grafana에서 확인할 것**
@@ -284,16 +294,21 @@ k6 run k6/scenarios/02-slow-call.js
 ### 시나리오 3: OPEN → HALF_OPEN → CLOSED 복구 흐름
 
 ```
-0s          20s  21s     31s   35s          55s
-├─phase-1───┤    │        │    ├─phase-3────┤
-  5VU/FAIL       │        │      3VU/recover 후 정상 응답 확인
-             [switch]  [phase-2]
-           recover 전환  2VU/OPEN 상태 503 확인
-                        (10s 대기 = wait-duration)
+0s            50s  51s      71s  65s              115s
+├──phase-1────┤    │         │   ├────phase-3──────┤
+  5VU/FAIL         │         │     3VU/recover 후 정상 응답 확인
+              [switch]   [phase-2]
+            recover 전환  2VU/OPEN 상태 503 확인
+                          (10s 대기 = wait-duration)
 ```
 
 ```bash
-k6 run k6/scenarios/03-recovery.js
+# 옵션 A — 빌트인 웹 대시보드 (http://localhost:5665)
+K6_WEB_DASHBOARD=true k6 run k6/scenarios/03-recovery.js
+
+# 옵션 B — Grafana 통합 (Dashboards → k6 Load Test Dashboard)
+K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9090/api/v1/write \
+k6 run --out experimental-prometheus-rw k6/scenarios/03-recovery.js
 ```
 
 **Grafana에서 확인할 것**
