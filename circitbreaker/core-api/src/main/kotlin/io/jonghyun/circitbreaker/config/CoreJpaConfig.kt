@@ -1,12 +1,3 @@
 package io.jonghyun.circitbreaker.config
 
-import org.springframework.boot.autoconfigure.domain.EntityScan
-import org.springframework.context.annotation.Configuration
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories
-import org.springframework.transaction.annotation.EnableTransactionManagement
-
-@Configuration
-@EnableTransactionManagement
-@EntityScan(basePackages = ["io.jonghyun.circitbreaker"])
-@EnableJpaRepositories(basePackages = ["io.jonghyun.circitbreaker"])
-internal class CoreJpaConfig
+// Circuit Breaker 학습 프로젝트 — JPA는 사용하지 않습니다.

@@ -1,7 +1,7 @@
 package io.jonghyun.circitbreaker.support.response
 
-import io.jonghyun.Redis.support.error.ErrorMessage
-import io.jonghyun.Redis.support.error.ErrorType
+import io.jonghyun.circitbreaker.support.error.ErrorMessage
+import io.jonghyun.circitbreaker.support.error.ErrorType
 
 data class ApiResponse<T> private constructor(
     val result: ResultType,
