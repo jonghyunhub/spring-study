@@ -40,7 +40,9 @@ services:
       - study-network
 
   elasticsearch:
-    image: elasticsearch:8.17.0
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: jonghyun-es
     restart: unless-stopped
     ports:

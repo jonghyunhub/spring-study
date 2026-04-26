@@ -1,7 +1,7 @@
 package io.jonghyun.Elasticsearch.support.response
 
-import io.jonghyun.Redis.support.error.ErrorMessage
-import io.jonghyun.Redis.support.error.ErrorType
+import io.jonghyun.Elasticsearch.support.error.ErrorMessage
+import io.jonghyun.Elasticsearch.support.error.ErrorType
 
 data class ApiResponse<T> private constructor(
     val result: ResultType,

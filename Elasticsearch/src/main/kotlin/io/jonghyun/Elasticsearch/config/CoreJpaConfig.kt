@@ -7,6 +7,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 
 @Configuration
 @EnableTransactionManagement
-@EntityScan(basePackages = ["io.jonghyun.Redis"])
-@EnableJpaRepositories(basePackages = ["io.jonghyun.Redis"])
+@EntityScan(basePackages = ["io.jonghyun.Elasticsearch"])
+@EnableJpaRepositories(basePackages = ["io.jonghyun.Elasticsearch"])
 internal class CoreJpaConfig
