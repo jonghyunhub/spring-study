@@ -1,4 +1,4 @@
-package io.jonghyun.Redis.support.error
+package io.jonghyun.Elasticsearch.support.error
 
 data class ErrorMessage private constructor(
     val code: String,

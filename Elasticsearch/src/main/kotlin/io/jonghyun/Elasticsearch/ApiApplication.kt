@@ -1,4 +1,4 @@
-package io.jonghyun.Redis
+package io.jonghyun.Elasticsearch
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan

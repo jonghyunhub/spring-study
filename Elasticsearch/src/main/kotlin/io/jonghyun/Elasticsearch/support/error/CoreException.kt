@@ -1,4 +1,4 @@
-package io.jonghyun.Redis.support.error
+package io.jonghyun.Elasticsearch.support.error
 
 class CoreException(
     val errorType: ErrorType,

@@ -1,4 +1,4 @@
-package io.jonghyun.Redis.config
+package io.jonghyun.Elasticsearch.config
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource

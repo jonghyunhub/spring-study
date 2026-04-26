@@ -1,4 +1,4 @@
-rootProject.name = "jonghyun-spring-study-Redis"
+rootProject.name = "jonghyun-spring-study-Elasticsearch"
 pluginManagement {
     val kotlinVersion: String by settings
     val springBootVersion: String by settings

@@ -1,4 +1,4 @@
-package io.jonghyun.Redis.support.response
+package io.jonghyun.Elasticsearch.support.response
 
 enum class ResultType {
     SUCCESS,

@@ -1,4 +1,4 @@
-package io.jonghyun.Redis.support.response
+package io.jonghyun.Elasticsearch.support.response
 
 import io.jonghyun.Redis.support.error.ErrorMessage
 import io.jonghyun.Redis.support.error.ErrorType

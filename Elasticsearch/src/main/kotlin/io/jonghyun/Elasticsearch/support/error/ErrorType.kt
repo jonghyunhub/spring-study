@@ -1,4 +1,4 @@
-package io.jonghyun.Redis.support.error
+package io.jonghyun.Elasticsearch.support.error
 
 import org.springframework.boot.logging.LogLevel
 import org.springframework.http.HttpStatus

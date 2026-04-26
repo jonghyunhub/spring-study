@@ -43,6 +43,9 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-data-jpa")
     runtimeOnly("com.mysql:mysql-connector-j")
 
+    // elasticsearch
+    implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
+
     // redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.redisson:redisson-spring-boot-starter:${property("redissonVersion")}")
