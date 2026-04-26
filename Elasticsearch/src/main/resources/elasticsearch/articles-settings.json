@@ -1,0 +1,16 @@
+{
+  "analysis": {
+    "char_filter": {
+      "html_strip_filter": {
+        "type": "html_strip"
+      }
+    },
+    "analyzer": {
+      "nori_html": {
+        "type": "custom",
+        "char_filter": ["html_strip_filter"],
+        "tokenizer": "nori_tokenizer"
+      }
+    }
+  }
+}
