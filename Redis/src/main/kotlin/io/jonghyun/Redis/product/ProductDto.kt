@@ -1,4 +1,4 @@
-package io.jonghyun.Redis.caching
+package io.jonghyun.Redis.product
 
 data class ProductDto(
     val id: Long = 0L,

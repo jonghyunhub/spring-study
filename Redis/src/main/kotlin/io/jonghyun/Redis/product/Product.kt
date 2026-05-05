@@ -1,4 +1,4 @@
-package io.jonghyun.Redis.caching
+package io.jonghyun.Redis.product
 
 import io.jonghyun.Redis.domain.BaseEntity
 import jakarta.persistence.Column

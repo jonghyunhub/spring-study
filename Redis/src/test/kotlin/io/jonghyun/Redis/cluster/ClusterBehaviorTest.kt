@@ -1,7 +1,7 @@
 package io.jonghyun.Redis.cluster
 
-import io.jonghyun.Redis.caching.Product
-import io.jonghyun.Redis.caching.ProductRepository
+import io.jonghyun.Redis.product.Product
+import io.jonghyun.Redis.product.ProductRepository
 import io.lettuce.core.RedisURI
 import io.lettuce.core.cluster.RedisClusterClient
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection

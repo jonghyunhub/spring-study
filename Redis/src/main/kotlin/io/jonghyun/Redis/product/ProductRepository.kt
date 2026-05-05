@@ -1,4 +1,4 @@
-package io.jonghyun.Redis.caching
+package io.jonghyun.Redis.product
 
 import org.springframework.data.jpa.repository.JpaRepository
 
