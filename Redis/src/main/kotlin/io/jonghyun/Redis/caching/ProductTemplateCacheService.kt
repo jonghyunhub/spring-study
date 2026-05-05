@@ -43,7 +43,6 @@ class ProductTemplateCacheService(
     }
 
     // Cache-Aside 쓰기: DB 저장 → 캐시 삭제 (다음 읽기 시 DB 재조회)
-    @Transactional
     fun updateProductCacheAside(id: Long, name: String): ProductDto {
         val product = loadFromDb(id)
         product.name = name
@@ -53,7 +52,6 @@ class ProductTemplateCacheService(
     }
 
     // Write-Through 쓰기: DB 저장 → 즉시 캐시 갱신
-    @Transactional
     fun updateProductWriteThrough(id: Long, name: String): ProductDto {
         val product = loadFromDb(id)
         product.name = name
