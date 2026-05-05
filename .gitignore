@@ -6,6 +6,7 @@ build/
 
 ### IDEA ###
 .idea
+.profileconfig.json
 *.iws
 *.iml
 *.ipr
