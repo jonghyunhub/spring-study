@@ -55,6 +55,8 @@ class CacheAsideTest(
         @Test
         @DisplayName("@Cacheable - 첫 조회 후 캐시 적재, 두 번째 조회는 캐시 히트")
         fun annotationCacheHitMiss() {
+            assertThat(cacheManager.getCache("products")?.get(product.id, ProductDto::class.java)).isNull()
+
             val first = cacheAsideService.getProduct(product.id)
             assertThat(cacheManager.getCache("products")?.get(product.id, ProductDto::class.java)).isNotNull()
 
@@ -65,6 +67,8 @@ class CacheAsideTest(
         @Test
         @DisplayName("RedisTemplate - 첫 조회 후 Redis 키 적재, 두 번째 조회는 캐시 히트")
         fun templateCacheHitMiss() {
+            assertThat(redisTemplate.hasKey(cacheAsideTemplateService.cacheKey(product.id))).isFalse()
+
             val first = cacheAsideTemplateService.getProduct(product.id)
             assertThat(redisTemplate.hasKey(cacheAsideTemplateService.cacheKey(product.id))).isTrue()
 
