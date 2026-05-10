@@ -11,8 +11,12 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.TransactionManager
+import org.springframework.transaction.support.TransactionTemplate
 
 /**
  * Cache-Aside 전략 — @Cacheable vs RedisTemplate 비교
@@ -29,9 +33,11 @@ class CacheAsideTest(
     private val productRepository: ProductRepository,
     private val cacheManager: CacheManager,
     private val redisTemplate: StringRedisTemplate,
+    transactionManager: PlatformTransactionManager
 ) : IntegrationTest() {
 
     private lateinit var product: Product
+    private val transactionTemplate = TransactionTemplate(transactionManager)
 
     @BeforeEach
     fun setUp() {
@@ -118,6 +124,24 @@ class CacheAsideTest(
             assertThat(cached?.name).isEqualTo("원래 이름")
 
             assertThat(cacheAsideService.getProduct(product.id).name).isEqualTo("원래 이름")
+        }
+
+        @Test
+        @DisplayName("잘못된 캐시, 트랜잭션 순서 적용 롤백시 문제 발생")
+        fun wrongCacheUpdateWithTransaction() {
+            cacheAsideService.getProduct(product.id)
+
+           transactionTemplate.execute { status ->
+               // 스프링 트랜잭션 내부에 캐시 evict 로직 포함
+               cacheAsideService.updateProductWrongCacheTransaction(product.id, "변경된 이름")
+               status.setRollbackOnly() // 트랜잭션 롤백
+           }
+
+
+            val newProduct = productRepository.findById(product.id)
+            assertThat(newProduct.get().name).isEqualTo(product.name) // 트랜잭션 롤백되어 이전과 동일
+            val newCached = cacheManager.getCache("products")?.get(product.id, ProductDto::class.java)
+            assertThat(newCached).isNotNull() // 트랜잭션이 롤백되어 캐시가 존재해야 하지만 캐시가 비워짐
         }
     }
 
