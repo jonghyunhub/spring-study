@@ -58,6 +58,23 @@ class WriteThroughService(
         return saved.toDto()
     }
 
+    // Cache Pollution 해결 (TTL) — 짧은 TTL로 안 읽히는 데이터 자동 만료
+    @Transactional
+    fun updateProductWithTTOption(id: Long, name: String, ttl : Duration): ProductDto {
+        val product = loadFromDb(id)
+        product.name = name
+        val saved = productRepository.save(product)
+
+        TransactionSynchronizationManager.registerSynchronization(
+            object : TransactionSynchronization {
+                override fun afterCommit() {
+                    redisTemplate.opsForValue().set(cacheKey(id), objectMapper.writeValueAsString(saved.toDto()), ttl)
+                }
+            },
+        )
+        return saved.toDto()
+    }
+
     // Cache Pollution 해결 — 캐시에 이미 있는 경우에만 갱신
     @Transactional
     fun updateProductIfCached(id: Long, name: String): ProductDto {

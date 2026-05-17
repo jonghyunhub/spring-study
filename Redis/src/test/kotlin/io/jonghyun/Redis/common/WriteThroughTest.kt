@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.data.redis.core.StringRedisTemplate
+import java.time.Duration
 
 /**
  * Write-Through 전략
@@ -118,6 +119,21 @@ class WriteThroughTest(
             writeThroughService.updateProductIfCached(product.id, "변경된 이름")
 
             // 캐시에 없던 데이터는 갱신하지 않음 → Cache Pollution 방지
+            assertThat(redisTemplate.hasKey(cacheKey)).isFalse()
+        }
+
+        @Test
+        @DisplayName("[해결] 짧은 TTL을 통해 캐시 데이터 관리")
+        fun solutionTTLCache() {
+            val cacheKey = writeThroughService.cacheKey(product.id)
+            assertThat(redisTemplate.hasKey(cacheKey)).isFalse()
+
+            val shortTtl = Duration.ofSeconds(2)
+            writeThroughService.updateProductWithTTOption(product.id, "변경된 이름", shortTtl)
+
+            Thread.sleep(shortTtl.toMillis())
+
+            // TTL 옵션을 통해 불필요한 캐시 데이터 자동 정리
             assertThat(redisTemplate.hasKey(cacheKey)).isFalse()
         }
     }
