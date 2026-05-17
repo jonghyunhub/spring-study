@@ -8,6 +8,8 @@ import io.jonghyun.Redis.product.ProductRepository
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronization
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.time.Duration
 
 /**
@@ -27,7 +29,7 @@ import java.time.Duration
 class WriteThroughService(
     private val productRepository: ProductRepository,
     private val redisTemplate: StringRedisTemplate,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) {
     private val ttl = Duration.ofSeconds(60)
 
@@ -45,7 +47,15 @@ class WriteThroughService(
         val product = loadFromDb(id)
         product.name = name
         val saved = productRepository.save(product)
-        redisTemplate.opsForValue().set(cacheKey(id), objectMapper.writeValueAsString(saved.toDto()), ttl)
+
+        TransactionSynchronizationManager.registerSynchronization(
+            object : TransactionSynchronization {
+                override fun afterCommit() {
+                    redisTemplate.opsForValue().set(cacheKey(id), objectMapper.writeValueAsString(saved.toDto()), ttl)
+                }
+            },
+        )
+
         return saved.toDto()
     }
 
