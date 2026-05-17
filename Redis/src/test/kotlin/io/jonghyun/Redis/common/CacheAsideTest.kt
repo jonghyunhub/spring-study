@@ -11,11 +11,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.CacheManager
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.transaction.PlatformTransactionManager
-import org.springframework.transaction.TransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 
 /**

@@ -1,9 +1,9 @@
 package io.jonghyun.Redis.common
 
 import io.jonghyun.Redis.caching.CacheAsideTemplateService
+import io.jonghyun.Redis.caching.WriteThroughService
 import io.jonghyun.Redis.product.Product
 import io.jonghyun.Redis.product.ProductRepository
-import io.jonghyun.Redis.caching.WriteThroughService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -90,6 +90,43 @@ class WriteThroughTest(
 
             val result = writeThroughService.getProduct(product.id)
             assertThat(result.name).isEqualTo("변경된 이름")
+        }
+    }
+
+    @Nested
+    @DisplayName("문제점 케이스1 : Cache Pollution")
+    inner class CachePollution {
+        @Test
+        @DisplayName("한 번도 읽히지 않는 데이터가 쓰기 후 캐시에 존재")
+        fun writePollutesCaches() {
+            // given : 아직 캐시에 없는 데이터
+            val cacheKey = writeThroughService.cacheKey(product.id)
+            assertThat(redisTemplate.hasKey(cacheKey)).isFalse()
+
+            // getProduct() 한 번도 호출하지 않음 (읽기 없음)
+            writeThroughService.updateProduct(id = product.id, name = "변경된 이름")
+
+            // 읽히지 않았지만 캐시에 존재 → 불필요한 메모리 점유
+            assertThat(redisTemplate.hasKey(cacheKey)).isTrue()
+        }
+    }
+
+
+    @Nested
+    @DisplayName("문제점 케이스2 : Cold Start")
+    inner class ColdStart {
+        @Test
+        @DisplayName("Cold Start — 쓰기 없이 읽기만 하면 캐시 미스")
+        fun coldStartOnReadOnly() {
+            // 캐시에 상품 데이터 없음
+            val cacheKey = writeThroughService.cacheKey(product.id)
+            assertThat(redisTemplate.hasKey(cacheKey)).isFalse()
+
+            // 상품 데이터 read
+            writeThroughService.getProduct(product.id)
+
+            // read 했으나 상품데이터 캐시에 적재하지 않음. CUD 연산이 없다면 계속 cache miss
+            assertThat(redisTemplate.hasKey(cacheKey)).isFalse()
         }
     }
 }
