@@ -1,0 +1,191 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1778995694666,
+  "projectRoot": "/Users/jonghchoo/Desktop/study/spring-study",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "Elasticsearch": {
+      "path": "Elasticsearch",
+      "purpose": null,
+      "fileCount": 7,
+      "lastAccessed": 1778995694638,
+      "keyFiles": [
+        "build.gradle.kts",
+        "gradle.properties",
+        "gradlew",
+        "gradlew.bat",
+        "settings.gradle.kts"
+      ]
+    },
+    "MySQL": {
+      "path": "MySQL",
+      "purpose": null,
+      "fileCount": 8,
+      "lastAccessed": 1778995694639,
+      "keyFiles": [
+        "README.md",
+        "build.gradle.kts",
+        "gradle.properties",
+        "gradlew",
+        "gradlew.bat"
+      ]
+    },
+    "Redis": {
+      "path": "Redis",
+      "purpose": null,
+      "fileCount": 8,
+      "lastAccessed": 1778995694639,
+      "keyFiles": [
+        "README.md",
+        "build.gradle.kts",
+        "gradle.properties",
+        "gradlew",
+        "gradlew.bat"
+      ]
+    },
+    "circitbreaker": {
+      "path": "circitbreaker",
+      "purpose": null,
+      "fileCount": 8,
+      "lastAccessed": 1778995694639,
+      "keyFiles": [
+        "README.md",
+        "build.gradle.kts",
+        "gradle.properties",
+        "gradlew",
+        "gradlew.bat"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 0,
+      "lastAccessed": 1778995694640,
+      "keyFiles": []
+    },
+    "jpa": {
+      "path": "jpa",
+      "purpose": null,
+      "fileCount": 5,
+      "lastAccessed": 1778995694640,
+      "keyFiles": [
+        "build.gradle.kts",
+        "gradle.properties",
+        "gradlew",
+        "gradlew.bat",
+        "settings.gradle.kts"
+      ]
+    },
+    "Elasticsearch/build": {
+      "path": "Elasticsearch/build",
+      "purpose": "Build output",
+      "fileCount": 0,
+      "lastAccessed": 1778995694641,
+      "keyFiles": []
+    },
+    "MySQL/build": {
+      "path": "MySQL/build",
+      "purpose": "Build output",
+      "fileCount": 0,
+      "lastAccessed": 1778995694642,
+      "keyFiles": []
+    },
+    "Redis/build": {
+      "path": "Redis/build",
+      "purpose": "Build output",
+      "fileCount": 0,
+      "lastAccessed": 1778995694642,
+      "keyFiles": []
+    },
+    "circitbreaker/build": {
+      "path": "circitbreaker/build",
+      "purpose": "Build output",
+      "fileCount": 0,
+      "lastAccessed": 1778995694643,
+      "keyFiles": []
+    },
+    "jpa/build": {
+      "path": "jpa/build",
+      "purpose": "Build output",
+      "fileCount": 0,
+      "lastAccessed": 1778995694644,
+      "keyFiles": []
+    },
+    "jpa/src": {
+      "path": "jpa/src",
+      "purpose": "Source code",
+      "fileCount": 0,
+      "lastAccessed": 1778995694644,
+      "keyFiles": []
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "Redis/src/main/kotlin/io/jonghyun/Redis/caching/CacheAsideService.kt",
+      "accessCount": 2,
+      "lastAccessed": 1778995921890,
+      "type": "file"
+    },
+    {
+      "path": "Redis/src/test/kotlin/io/jonghyun/Redis/common/CacheAsideTest.kt",
+      "accessCount": 2,
+      "lastAccessed": 1778995923702,
+      "type": "file"
+    },
+    {
+      "path": "Redis/src/test/kotlin/io/jonghyun/Redis/common/IntegrationTest.kt",
+      "accessCount": 1,
+      "lastAccessed": 1778852351295,
+      "type": "file"
+    },
+    {
+      "path": "Redis/src/main/kotlin/io/jonghyun/Redis/caching/WriteThroughService.kt",
+      "accessCount": 1,
+      "lastAccessed": 1778995922843,
+      "type": "file"
+    },
+    {
+      "path": "Redis/src/main/kotlin/io/jonghyun/Redis/caching/WriteBehindService.kt",
+      "accessCount": 1,
+      "lastAccessed": 1778995923106,
+      "type": "file"
+    },
+    {
+      "path": "Redis/src/main/kotlin/io/jonghyun/Redis/caching/CacheAsideTemplateService.kt",
+      "accessCount": 1,
+      "lastAccessed": 1778997559423,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

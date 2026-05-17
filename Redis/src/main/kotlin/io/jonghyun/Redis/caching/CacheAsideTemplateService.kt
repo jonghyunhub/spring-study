@@ -8,6 +8,8 @@ import io.jonghyun.Redis.product.ProductRepository
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronization
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.time.Duration
 
 /**
@@ -51,7 +53,15 @@ class CacheAsideTemplateService(
         val product = loadFromDb(id)
         product.name = name
         val saved = productRepository.save(product)
-        redisTemplate.delete(cacheKey(id))
+
+        TransactionSynchronizationManager.registerSynchronization(
+            object : TransactionSynchronization {
+                override fun afterCommit() {
+                    redisTemplate.delete(cacheKey(id))
+                }
+            }
+        )
+
         return saved.toDto()
     }
 
