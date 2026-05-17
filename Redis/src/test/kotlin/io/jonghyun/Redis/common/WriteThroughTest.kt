@@ -66,7 +66,7 @@ class WriteThroughTest(
         @DisplayName("Write-Through - 쓰기 후 캐시 키 유지 (갱신) → 다음 읽기에서 캐시 히트")
         fun writeThroughUpdatesKeyAfterWrite() {
             val key = writeThroughService.cacheKey(product.id)
-            writeThroughService.getProduct(product.id)
+            writeThroughService.preloadCache(product.id)
             assertThat(redisTemplate.hasKey(key)).isTrue()
 
             writeThroughService.updateProduct(product.id, "변경된 이름")
@@ -97,36 +97,58 @@ class WriteThroughTest(
     @DisplayName("문제점 케이스1 : Cache Pollution")
     inner class CachePollution {
         @Test
-        @DisplayName("한 번도 읽히지 않는 데이터가 쓰기 후 캐시에 존재")
+        @DisplayName("[문제] 한 번도 읽히지 않는 데이터가 쓰기 후 캐시에 존재")
         fun writePollutesCaches() {
-            // given : 아직 캐시에 없는 데이터
             val cacheKey = writeThroughService.cacheKey(product.id)
             assertThat(redisTemplate.hasKey(cacheKey)).isFalse()
 
-            // getProduct() 한 번도 호출하지 않음 (읽기 없음)
             writeThroughService.updateProduct(id = product.id, name = "변경된 이름")
 
             // 읽히지 않았지만 캐시에 존재 → 불필요한 메모리 점유
             assertThat(redisTemplate.hasKey(cacheKey)).isTrue()
         }
-    }
 
+        @Test
+        @DisplayName("[해결] 기존 캐시 키 있을 때만 갱신 → 읽히지 않는 데이터는 캐시에 적재하지 않음")
+        fun solutionUpdateOnlyIfCached() {
+            val cacheKey = writeThroughService.cacheKey(product.id)
+            assertThat(redisTemplate.hasKey(cacheKey)).isFalse()
+
+            // getProduct() 호출 없이 바로 업데이트
+            writeThroughService.updateProductIfCached(product.id, "변경된 이름")
+
+            // 캐시에 없던 데이터는 갱신하지 않음 → Cache Pollution 방지
+            assertThat(redisTemplate.hasKey(cacheKey)).isFalse()
+        }
+    }
 
     @Nested
     @DisplayName("문제점 케이스2 : Cold Start")
     inner class ColdStart {
         @Test
-        @DisplayName("Cold Start — 쓰기 없이 읽기만 하면 캐시 미스")
+        @DisplayName("[문제] Cold Start — 쓰기 없이 읽기만 하면 캐시 미스")
         fun coldStartOnReadOnly() {
-            // 캐시에 상품 데이터 없음
             val cacheKey = writeThroughService.cacheKey(product.id)
             assertThat(redisTemplate.hasKey(cacheKey)).isFalse()
 
-            // 상품 데이터 read
             writeThroughService.getProduct(product.id)
 
             // read 했으나 상품데이터 캐시에 적재하지 않음. CUD 연산이 없다면 계속 cache miss
             assertThat(redisTemplate.hasKey(cacheKey)).isFalse()
+        }
+
+        @Test
+        @DisplayName("[해결] Cache Warming — 사전 적재 후 첫 읽기에서 캐시 히트")
+        fun solutionCacheWarming() {
+            val cacheKey = writeThroughService.cacheKey(product.id)
+
+            // 서버 기동 시 자주 읽히는 데이터 미리 적재
+            writeThroughService.preloadCache(product.id)
+            assertThat(redisTemplate.hasKey(cacheKey)).isTrue()
+
+            // 첫 읽기에서도 캐시 히트
+            val result = writeThroughService.getProduct(product.id)
+            assertThat(result.name).isEqualTo("원래 이름")
         }
     }
 }

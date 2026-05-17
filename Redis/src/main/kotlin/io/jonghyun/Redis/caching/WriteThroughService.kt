@@ -58,6 +58,31 @@ class WriteThroughService(
         return saved.toDto()
     }
 
+    // Cache Pollution 해결 — 캐시에 이미 있는 경우에만 갱신
+    @Transactional
+    fun updateProductIfCached(id: Long, name: String): ProductDto {
+        val product = loadFromDb(id)
+        product.name = name
+        val saved = productRepository.save(product)
+
+        TransactionSynchronizationManager.registerSynchronization(
+            object : TransactionSynchronization {
+                override fun afterCommit() {
+                    if (redisTemplate.hasKey(cacheKey(id))) {
+                        redisTemplate.opsForValue().set(cacheKey(id), objectMapper.writeValueAsString(saved.toDto()), ttl)
+                    }
+                }
+            },
+        )
+        return saved.toDto()
+    }
+
+    // Cold Start 해결 — 캐시 워밍 (서버 기동 시 자주 읽히는 데이터 사전 적재)
+    fun preloadCache(id: Long) {
+        val product = loadFromDb(id)
+        redisTemplate.opsForValue().set(cacheKey(id), objectMapper.writeValueAsString(product.toDto()), ttl)
+    }
+
     fun evict(id: Long) = redisTemplate.delete(cacheKey(id))
 
     fun cacheKey(id: Long) = "write-through:products:$id"
