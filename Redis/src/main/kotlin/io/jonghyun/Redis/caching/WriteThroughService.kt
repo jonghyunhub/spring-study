@@ -38,7 +38,6 @@ class WriteThroughService(
         if (cached != null) return objectMapper.readValue(cached)
 
         val product = loadFromDb(id)
-        redisTemplate.opsForValue().set(cacheKey(id), objectMapper.writeValueAsString(product.toDto()), ttl)
         return product.toDto()
     }
 
