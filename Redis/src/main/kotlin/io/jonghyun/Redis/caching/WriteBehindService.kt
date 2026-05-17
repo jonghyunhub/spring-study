@@ -8,6 +8,8 @@ import io.jonghyun.Redis.product.ProductRepository
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronization
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.time.Duration
 
 /**
@@ -25,7 +27,7 @@ import java.time.Duration
 class WriteBehindService(
     private val productRepository: ProductRepository,
     private val redisTemplate: StringRedisTemplate,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) {
     private val ttl = Duration.ofSeconds(60)
 
@@ -52,6 +54,8 @@ class WriteBehindService(
         val dirtyIds = redisTemplate.opsForSet().members(dirtySetKey()) ?: return
         if (dirtyIds.isEmpty()) return
 
+        val processedIds = mutableListOf<String>()
+
         for (rawId in dirtyIds) {
             val id = rawId.toLong()
             val cached = redisTemplate.opsForValue().get(cacheKey(id)) ?: continue
@@ -59,8 +63,18 @@ class WriteBehindService(
             val product = productRepository.findById(id).orElse(null) ?: continue
             product.name = dto.name
             productRepository.save(product)
-            redisTemplate.opsForSet().remove(dirtySetKey(), rawId)
+            // 여기서 개별 캐시 remove하면 안됨 => 캐시 remove는 스프링 트랜잭션에 참여하지 않음
+            processedIds.add(rawId)  // 성공한 것만 추가
         }
+
+        // Transaction After Commit : cache bulk remove
+        TransactionSynchronizationManager.registerSynchronization(
+            object : TransactionSynchronization {
+                override fun afterCommit() {
+                    redisTemplate.opsForSet().remove(dirtySetKey(), *processedIds.toTypedArray())
+                }
+            },
+        )
     }
 
     fun evict(id: Long) {
