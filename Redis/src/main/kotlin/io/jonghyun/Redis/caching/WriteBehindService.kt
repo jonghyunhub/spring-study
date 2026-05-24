@@ -36,7 +36,6 @@ class WriteBehindService(
         if (cached != null) return objectMapper.readValue(cached)
 
         val product = loadFromDb(id)
-        redisTemplate.opsForValue().set(cacheKey(id), objectMapper.writeValueAsString(product.toDto()), ttl)
         return product.toDto()
     }
 
@@ -67,6 +66,8 @@ class WriteBehindService(
             processedIds.add(rawId)  // 성공한 것만 추가
         }
 
+        if (processedIds.isEmpty()) return
+
         // Transaction After Commit : cache bulk remove
         TransactionSynchronizationManager.registerSynchronization(
             object : TransactionSynchronization {
@@ -80,8 +81,8 @@ class WriteBehindService(
     fun updateProductWithTTL(id: Long, name: String, customTtl: Duration): ProductDto {
         val product = loadFromDb(id)
         val dto = ProductDto(id = id, name = name, price = product.price)
-        redisTemplate.opsForValue().set(cacheKey(id), objectMapper.writeValueAsString(dto), customTtl)
-        redisTemplate.opsForSet().add(dirtySetKey(), id.toString())
+        redisTemplate.opsForValue().set(cacheKey(id), objectMapper.writeValueAsString(dto), customTtl) // data 변경점 기록 set
+        redisTemplate.opsForSet().add(dirtySetKey(), id.toString()) // 변경된 데이터 cache 에 저장
         return dto
     }
 
