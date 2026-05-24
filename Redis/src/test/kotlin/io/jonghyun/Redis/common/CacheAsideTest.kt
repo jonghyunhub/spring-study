@@ -125,21 +125,23 @@ class CacheAsideTest(
         }
 
         @Test
-        @DisplayName("잘못된 캐시, 트랜잭션 순서 적용 롤백시 문제 발생")
+        @DisplayName("[버그 재현] @CacheEvict가 afterCommit이 아니라서 롤백돼도 캐시는 이미 비워짐")
         fun wrongCacheUpdateWithTransaction() {
             cacheAsideService.getProduct(product.id)
 
            transactionTemplate.execute { status ->
-               // 스프링 트랜잭션 내부에 캐시 evict 로직 포함
+               // @CacheEvict는 메서드 반환 직후(트랜잭션 커밋 전) 실행됨
                cacheAsideService.updateProductWrongCacheTransaction(product.id, "변경된 이름")
                status.setRollbackOnly() // 트랜잭션 롤백
            }
 
-
+            // DB는 트랜잭션 롤백으로 원래 이름 유지
             val newProduct = productRepository.findById(product.id)
-            assertThat(newProduct.get().name).isEqualTo(product.name) // 트랜잭션 롤백되어 이전과 동일
+            assertThat(newProduct.get().name).isEqualTo(product.name)
+
+            // 그러나 캐시는 이미 evict된 상태 → DB는 구 값, 캐시는 빈 상태로 불일치 발생
             val newCached = cacheManager.getCache("products")?.get(product.id, ProductDto::class.java)
-            assertThat(newCached).isNotNull() // 트랜잭션이 롤백되어 캐시가 존재해야 하지만 캐시가 비워짐
+            assertThat(newCached).isNull()
         }
     }
 

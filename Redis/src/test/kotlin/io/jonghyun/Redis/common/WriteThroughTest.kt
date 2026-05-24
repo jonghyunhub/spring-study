@@ -129,7 +129,7 @@ class WriteThroughTest(
             assertThat(redisTemplate.hasKey(cacheKey)).isFalse()
 
             val shortTtl = Duration.ofSeconds(2)
-            writeThroughService.updateProductWithTTOption(product.id, "변경된 이름", shortTtl)
+            writeThroughService.updateProductWithTtl(product.id, "변경된 이름", shortTtl)
 
             Thread.sleep(shortTtl.toMillis())
 

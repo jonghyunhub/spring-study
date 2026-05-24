@@ -67,6 +67,30 @@ class WriteBehindTest(
     }
 
     @Nested
+    @DisplayName("TTL — flush 주기보다 짧은 TTL 설정 시 데이터 유실")
+    inner class TTLExpiry {
+
+        @Test
+        @DisplayName("[문제] TTL 만료 후 flush → 캐시 없어 처리 못함, dirty-set에 영구 잔류")
+        fun dataLossWhenCacheExpiredBeforeFlush() {
+            val shortTtl = java.time.Duration.ofMillis(100)
+            writeBehindService.updateProductWithTTL(product.id, "변경된 이름", shortTtl)
+
+            Thread.sleep(200) // TTL 만료 대기
+
+            writeBehindService.flushPendingUpdates()
+
+            // 캐시 만료로 flush 시 처리 불가 → DB에 반영 안 됨
+            val dbProduct = productRepository.findById(product.id).get()
+            assertThat(dbProduct.name).isEqualTo("원래 이름")
+
+            // dirty-set에 여전히 남아있음 → 이후 flush에서도 영구 미반영
+            val dirtyMembers = redisTemplate.opsForSet().members(writeBehindService.dirtySetKey())
+            assertThat(dirtyMembers).contains(product.id.toString())
+        }
+    }
+
+    @Nested
     @DisplayName("flush — DB 동기화")
     inner class Flush {
 

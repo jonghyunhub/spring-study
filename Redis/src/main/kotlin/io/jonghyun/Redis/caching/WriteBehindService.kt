@@ -77,6 +77,14 @@ class WriteBehindService(
         )
     }
 
+    fun updateProductWithTTL(id: Long, name: String, customTtl: Duration): ProductDto {
+        val product = loadFromDb(id)
+        val dto = ProductDto(id = id, name = name, price = product.price)
+        redisTemplate.opsForValue().set(cacheKey(id), objectMapper.writeValueAsString(dto), customTtl)
+        redisTemplate.opsForSet().add(dirtySetKey(), id.toString())
+        return dto
+    }
+
     fun evict(id: Long) {
         redisTemplate.delete(cacheKey(id))
         redisTemplate.opsForSet().remove(dirtySetKey(), id.toString())

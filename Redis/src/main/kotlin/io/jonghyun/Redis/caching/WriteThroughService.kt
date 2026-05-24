@@ -15,7 +15,7 @@ import java.time.Duration
 /**
  * Write-Through 전략 — RedisTemplate 명령형 방식
  *
- * 읽기: 캐시 확인 → 미스 시 DB 조회 후 캐시 저장 (Cache-Aside 읽기와 동일)
+ * 읽기: 캐시 확인 → 히트 시 반환, 미스 시 DB만 조회 (캐시 적재 X → Cold Start 발생)
  * 쓰기: DB 저장 + 즉시 캐시 갱신 (키 삭제가 아닌 갱신)
  *
  * Cache-Aside 쓰기와의 차이:
@@ -23,7 +23,8 @@ import java.time.Duration
  *   Write-Through → 캐시 키 갱신 → 다음 읽기에서 바로 캐시 히트
  *
  * 장점: 쓰기 후 즉시 캐시 히트 가능, 읽기 일관성 높음
- * 단점: 읽히지 않는 데이터도 캐시에 저장되어 자원 낭비 가능
+ * 단점: 읽히지 않는 데이터도 캐시에 저장되어 자원 낭비 가능 (Cache Pollution),
+ *      쓰기 없이 읽기만 하면 캐시가 채워지지 않음 (Cold Start)
  */
 @Service
 class WriteThroughService(
@@ -60,7 +61,7 @@ class WriteThroughService(
 
     // Cache Pollution 해결 (TTL) — 짧은 TTL로 안 읽히는 데이터 자동 만료
     @Transactional
-    fun updateProductWithTTOption(id: Long, name: String, ttl : Duration): ProductDto {
+    fun updateProductWithTtl(id: Long, name: String, ttl: Duration): ProductDto {
         val product = loadFromDb(id)
         product.name = name
         val saved = productRepository.save(product)
