@@ -31,6 +31,16 @@ CREATE TABLE stock
     UNIQUE INDEX uk_product_id (product_id)
 );
 
+CREATE TABLE goods
+(
+    id         BIGINT PRIMARY KEY,
+    name       varchar(50) NOT NULL,
+    price      BIGINT      NOT NULL,
+    stock      INT         NOT NULL,
+    category   varchar(10) NOT NULL,
+    updated_at DATETIME(6) NOT NULL
+);
+
 -- 테스트용 초기 데이터
 INSERT INTO product (name, created_at, updated_at)
 VALUES ('두바이 쫀득 쿠키', NOW(), NOW());
