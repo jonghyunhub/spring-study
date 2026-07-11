@@ -82,3 +82,12 @@
 # Redis
 
 [Spring @Cacheable Deep Dive](https://velog.io/@jonghyun3668/Spring-Cachable-Deep-Dive)
+
+[Redis Template Deep Dive](https://velog.io/@jonghyun3668/RedisTemplate-%EC%9D%98-%EA%B5%AC%EC%A1%B0%EC%99%80-%EB%8F%99%EC%9E%91%EC%9B%90%EB%A6%AC-Deep-dive)
+
+## Cache Strategy
+
+[상황별 적절한 캐싱 전략은? - 1편](https://velog.io/@jonghyun3668/%EC%83%81%ED%99%A9%EB%B3%84-%EC%A0%81%EC%A0%88%ED%95%9C-%EC%BA%90%EC%8B%B1-%EC%A0%84%EB%9E%B5%EC%9D%80)
+
+[상황별 적절한 캐싱 전략은? - 2편](https://velog.io/@jonghyun3668/%EC%83%81%ED%99%A9%EB%B3%84-%EC%A0%81%EC%A0%88%ED%95%9C-%EC%BA%90%EC%8B%B1-%EC%A0%84%EB%9E%B5%EC%9D%80-2%ED%8E%B8)
+
