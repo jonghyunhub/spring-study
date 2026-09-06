@@ -1,6 +1,41 @@
 name: circuitbreaker-study
 
 services:
+  mysql:
+    image: mysql:8.0
+    container_name: cb-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: circuitbreakerdb
+      MYSQL_USER: jonghyun-mysql
+      MYSQL_PASSWORD: jonghyun-mysql
+      MYSQL_ROOT_PASSWORD: root
+      TZ: Asia/Seoul
+    volumes:
+      - mysql-data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - study-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: cb-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - study-network
+
   prometheus:
     image: prom/prometheus:latest
     container_name: cb-prometheus
@@ -35,6 +70,10 @@ services:
       - study-network
 
 volumes:
+  mysql-data:
+    driver: local
+  redis-data:
+    driver: local
   grafana-data:
     driver: local
 

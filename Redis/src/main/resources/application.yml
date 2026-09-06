@@ -21,6 +21,23 @@ server:
       max: 600
       min-spare: 100
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      percentiles:
+        http.server.requests: 0.5,0.95,0.99
+
 
 ---
 spring.config.activate.on-profile: local
@@ -28,11 +45,11 @@ spring.config.activate.on-profile: local
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       hibernate:
-        format_sql: true
-        show_sql: true
+        format_sql: false
+        show_sql: false
   data:
     redis:
       host: localhost
@@ -52,7 +69,7 @@ storage:
       jdbc-url: jdbc:mysql://localhost:3306/redisdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
       username: jonghyun-mysql
       password: jonghyun-mysql
-      maximum-pool-size: 5
+      maximum-pool-size: 20
       connection-timeout: 1100
       keepalive-time: 30000
       validation-timeout: 1000
@@ -215,7 +232,7 @@ spring.config.activate.on-profile: cluster
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true

@@ -1,0 +1,27 @@
+# 테스트 전용 오버라이드.
+# @ActiveProfiles("test")를 쓰면 main application.yml의 local 문서 블록이 비활성화되므로
+# stub.service.url을 여기서 정의한다. (StubServiceClient는 mockk로 대체되어 실제 호출은 없다)
+stub:
+  service:
+    url: http://localhost:8081
+
+# JPA 의존성 추가로 DataSource가 필수가 되었으므로, 실제 MySQL 없이도 컨텍스트가 뜨도록 H2 인메모리로 대체한다.
+spring:
+  datasource:
+    url: jdbc:h2:mem:circuitbreaker;MODE=MySQL
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      stub-service:
+        # 운영 설정은 10s. OPEN -> HALF_OPEN 전이를 테스트에서 기다릴 수 있도록 짧게 줄인다.
+        # 나머지 항목(sliding-window-size, minimum-number-of-calls 등)은 main 설정을 그대로 상속한다.
+        wait-duration-in-open-state: 500ms
+  retry:
+    instances:
+      stub-service:
+        wait-duration: 10ms

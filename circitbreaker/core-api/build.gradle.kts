@@ -50,6 +50,14 @@ dependencies {
     implementation("io.github.openfeign:feign-hc5")
     implementation("io.github.openfeign:feign-micrometer")
 
+    // storage - product 테이블 조회용
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    runtimeOnly("com.mysql:mysql-connector-j")
+    testRuntimeOnly("com.h2database:h2")
+
+    // redis - 캐시 조회(mget) 및 장애 감지용
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
     // monitoring - prometheus 메트릭 수집
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-registry-prometheus")
