@@ -58,6 +58,9 @@ dependencies {
     // redis - 캐시 조회(mget) 및 장애 감지용
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
+    // local cache - L1(Caffeine) -> L2(Redis) layered cache 실험용
+    implementation("com.github.ben-manes.caffeine:caffeine")
+
     // monitoring - prometheus 메트릭 수집
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-registry-prometheus")

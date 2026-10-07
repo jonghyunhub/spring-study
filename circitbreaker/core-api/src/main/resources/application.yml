@@ -14,7 +14,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, prometheus, circuitbreakers, circuitbreakerevents
+        include: health, prometheus, metrics, circuitbreakers, circuitbreakerevents
   endpoint:
     health:
       show-details: always
@@ -60,6 +60,36 @@ spring:
     redis:
       host: localhost
       port: 6379
+
+stub:
+  service:
+    url: http://localhost:8081
+
+---
+# layered cache 실험용: Redis Cluster(docker/docker-compose-cluster.yml) 에 연결
+# 실행: ./gradlew :core-api:bootRun --args='--spring.profiles.active=cluster'
+spring:
+  config:
+    activate:
+      on-profile: cluster
+  datasource:
+    url: jdbc:mysql://localhost:3306/circuitbreakerdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+    username: jonghyun-mysql
+    password: jonghyun-mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+  data:
+    redis:
+      cluster:
+        nodes:
+          - localhost:7001
+          - localhost:7002
+          - localhost:7003
+          - localhost:7004
+          - localhost:7005
+          - localhost:7006
 
 stub:
   service:
