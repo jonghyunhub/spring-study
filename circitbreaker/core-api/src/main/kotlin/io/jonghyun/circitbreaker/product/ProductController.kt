@@ -15,6 +15,7 @@ class ProductController(
     private val productService: ProductService,
     private val productCircuitBreakerService: ProductCircuitBreakerService,
     private val productSeedService: ProductSeedService,
+    private val singleFlightService: SingleFlightService
 ) {
 
     @GetMapping("/{id}")
@@ -37,5 +38,13 @@ class ProductController(
     @PostMapping("/seed")
     fun seed(@RequestParam count: Int, @RequestParam(defaultValue = "10") ratio: Int): ApiResponse<String> {
         return ApiResponse.success(productSeedService.seed(count, ratio))
+    }
+
+    @GetMapping("/single-flight/products/{id}")
+    fun getProductsWithSingleFlight(@PathVariable id: Long): ApiResponse<ProductResponse> {
+        val productDto = singleFlightService.getProducts(id)
+        return ApiResponse.success(
+            ProductResponse(productDto.id, productDto.name, productDto.status)
+        )
     }
 }

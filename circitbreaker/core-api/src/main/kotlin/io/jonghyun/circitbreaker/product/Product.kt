@@ -11,4 +11,8 @@ data class Product(
     val id: Long,
     val name: String,
     val status: String,
-)
+) {
+    fun toDto(): ProductDto {
+        return ProductDto(id, name, status)
+    }
+}
