@@ -11,7 +11,7 @@ class SingleFlightService(
     private val singleFlight: SingleFlight<String, ProductDto>,
 ) {
 
-    fun getProducts(id: Long): ProductDto {
+    fun getProductsWithSingleFlight(id: Long): ProductDto {
         val key = "product:$id"
 
         redisTemplate.opsForValue().get(key)?.let { return it }
@@ -25,6 +25,16 @@ class SingleFlightService(
                 .orElseThrow { NoSuchElementException("상품이 존재하지 않습니다.") }.toDto()
                 .also { redisTemplate.opsForValue().set(key, it, Duration.ofMinutes(10)) }
         }
+    }
+
+    fun getProductsWithOutSingleFlight(id: Long): ProductDto {
+        val key = "product:$id"
+
+        redisTemplate.opsForValue().get(key)?.let { return it }
+
+        return productRepository.findById(id)
+            .orElseThrow { NoSuchElementException("상품이 존재하지 않습니다.") }.toDto()
+            .also { redisTemplate.opsForValue().set(key, it, Duration.ofMinutes(10)) }
     }
 
 }

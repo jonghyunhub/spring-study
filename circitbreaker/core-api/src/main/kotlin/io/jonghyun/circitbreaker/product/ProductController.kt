@@ -42,7 +42,15 @@ class ProductController(
 
     @GetMapping("/single-flight/products/{id}")
     fun getProductsWithSingleFlight(@PathVariable id: Long): ApiResponse<ProductResponse> {
-        val productDto = singleFlightService.getProducts(id)
+        val productDto = singleFlightService.getProductsWithSingleFlight(id)
+        return ApiResponse.success(
+            ProductResponse(productDto.id, productDto.name, productDto.status)
+        )
+    }
+
+    @GetMapping("/no-single-flight/products/{id}")
+    fun getProductsWithOutSingleFlight(@PathVariable id: Long): ApiResponse<ProductResponse> {
+        val productDto = singleFlightService.getProductsWithOutSingleFlight(id)
         return ApiResponse.success(
             ProductResponse(productDto.id, productDto.name, productDto.status)
         )
